@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>RL Sinhala Keyboard — සිංහල යතුරුපුවරුව සහ Font Converter</title>
+<meta name="description" content="Voice typing, Singlish to Unicode, word suggestions, FM Abhaya & ISI legacy font conversion — all in one tool by V.P.R. Lakshan Vidanapathirana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true">
+  <svg class="leaf leaf-1" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
+  <svg class="leaf leaf-2" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
+  <svg class="leaf leaf-3" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><path d="M24 4C12 4 6 16 6 26c0 11 8 18 18 18s18-7 18-18C42 16 36 4 24 4Z"/><text x="24" y="30" text-anchor="middle" class="brand-glyph">ල</text></svg>
+      </div>
+      <div class="brand-text">
+        <h1>RL Sinhala Keyboard</h1>
+        <p class="tagline">Singlish → Unicode → FM Abhaya / ISI, එකම තැනකින්</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge">v1.0</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <nav class="tabs" role="tablist" aria-label="Main navigation">
+    <button class="tab-btn active" data-tab="type" role="tab" aria-selected="true">⌨️ ටයිප් කරන්න</button>
+    <button class="tab-btn" data-tab="convert" role="tab" aria-selected="false">🔄 Font Converter</button>
+    <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false">📖 උපදෙස්</button>
+  </nav>
+
+  <!-- ================= TYPE TAB ================= -->
+  <section class="tab-panel active" id="panel-type" role="tabpanel">
+    <div class="card editor-card">
+
+      <div class="editor-toolbar">
+        <button class="tool-btn mic-btn" id="micBtn" title="Voice Typing (si-LK)">
+          <svg viewBox="0 0 24 24" class="icon-mic"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 18v3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>හඬ ටයිප්</span>
+        </button>
+
+        <button class="tool-btn" id="kbToggleBtn" title="Show virtual keyboard">
+          <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 10h1M8 10h1M11 10h1M14 10h1M17 10h1M5 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>යතුරුපුවරුව</span>
+        </button>
+
+        <div class="tool-sep"></div>
+
+        <label class="tool-select-label" for="outputFontMode">Copy සඳහා ෆොන්ට් එක:</label>
+        <select id="outputFontMode" class="tool-select">
+          <option value="uni">Unicode</option>
+          <option value="fm">FM Abhaya</option>
+          <option value="isi">ISI</option>
+        </select>
+
+        <div class="tool-sep hide-mobile"></div>
+
+        <button class="tool-btn ghost" id="clearBtn" title="Clear text">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Clear</span>
+        </button>
+      </div>
+
+      <div class="mic-status" id="micStatus" hidden>
+        <span class="mic-dot"></span> <span id="micStatusText">ඇහුම්කන් දෙමින්… කථා කරන්න</span>
+      </div>
+
+      <div class="editor-body">
+        <textarea id="editor" class="sinhala-editor" rows="10" spellcheck="false"
+          placeholder="මෙතන ටයිප් කරන්න… (Singlish භාවිතා කරන්න — උදා: mama gedara yanawa)"></textarea>
+      </div>
+
+      <div class="suggestions-row" id="suggestionsRow" hidden>
+        <span class="sugg-label">යෝජනා:</span>
+        <div class="sugg-chips" id="suggChips"></div>
+      </div>
+
+      <div class="virtual-keyboard" id="virtualKeyboard" hidden></div>
+
+      <div class="editor-footer">
+        <div class="counts">
+          <span id="charCount">0 අකුරු</span> · <span id="wordCount">0 වචන</span>
+        </div>
+        <div class="copy-actions">
+          <button class="btn btn-outline" id="copyUnicodeBtn">Copy Unicode</button>
+          <button class="btn btn-outline" id="copyFmBtn">Copy as FM Abhaya</button>
+          <button class="btn btn-outline" id="copyIsiBtn">Copy as ISI</button>
+          <button class="btn btn-primary" id="downloadBtn">⬇ Download .txt</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONVERT TAB ================= -->
+  <section class="tab-panel" id="panel-convert" role="tabpanel" hidden>
+    <div class="card">
+      <h2 class="card-title">ෆොන්ට් Converter — Unicode ⇄ Legacy</h2>
+      <p class="card-sub">Unicode සිංහල පෙළ FM Abhaya / ISI වලට හෝ ඊට ප්‍රතිලෝමව convert කරන්න. Legacy පෙළ නිවැරදිව පෙන්වීමට ඔබේ document එකේ අදාළ ෆොන්ට් එක (FM Abhaya / ISI) install කර තිබිය යුතුයි.</p>
+
+      <div class="convert-controls">
+        <label for="convertDirection">Direction:</label>
+        <select id="convertDirection" class="tool-select">
+          <option value="uni2fm">Unicode → FM Abhaya</option>
+          <option value="uni2isi">Unicode → ISI</option>
+          <option value="fm2uni">FM Abhaya → Unicode</option>
+          <option value="isi2uni">ISI → Unicode</option>
+        </select>
+        <button class="btn btn-ghost" id="swapDirectionBtn" title="Swap direction">⇄ Swap</button>
+        <button class="btn btn-primary" id="convertBtn">Convert →</button>
+      </div>
+
+      <div class="convert-grid">
+        <div class="convert-col">
+          <div class="convert-col-head">
+            <label for="convertInput" id="convertInputLabel">Input (Unicode)</label>
+            <button class="mini-btn" id="pasteInputBtn">Paste</button>
+          </div>
+          <textarea id="convertInput" class="sinhala-editor" rows="9" placeholder="මෙතන පේළිය paste කරන්න හෝ ටයිප් කරන්න…"></textarea>
+        </div>
+        <div class="convert-col">
+          <div class="convert-col-head">
+            <label for="convertOutput" id="convertOutputLabel">Output (FM Abhaya)</label>
+            <button class="mini-btn" id="copyOutputBtn">Copy</button>
+          </div>
+          <textarea id="convertOutput" class="sinhala-editor legacy-preview" rows="9" readonly placeholder="Converted text මෙතන පෙන්වයි…"></textarea>
+        </div>
+      </div>
+
+      <details class="font-preview-loader">
+        <summary>Legacy font එකෙන්ම බලන්න ඕන ද? (.ttf upload කරන්න — preview සඳහා පමණි)</summary>
+        <div class="font-load-row">
+          <input type="file" id="fontFileInput" accept=".ttf,.otf,.woff,.woff2">
+          <span class="hint-text">ඔබේ පරිගණකයේ ඇති FM Abhaya / ISI Wijesekara ෆොන්ට් ෆයිලය upload කළොත්, output preview එක එම ෆොන්ට් එකෙන් පෙන්වයි. Font ෆයිල් server එකට upload වෙන්නේ නෑ — browser එකේ පමණි.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= GUIDE TAB ================= -->
+  <section class="tab-panel" id="panel-guide" role="tabpanel" hidden>
+    <div class="card">
+      <h2 class="card-title">Singlish ටයිප් කිරීමේ ක්‍රමය</h2>
+      <p class="card-sub">ඉංග්‍රීසි අකුරු වලින් ටයිප් කරද්දී, ඒවා ස්වයංක්‍රීයව සිංහල Unicode අකුරු බවට පරිවර්තනය වේ. පහත වගුවේ ඇති key scheme එක අනුව ටයිප් කරන්න.</p>
+
+      <div class="scheme-grid" id="schemeGrid"></div>
+
+      <h3 class="sub-head">විශේෂ අකුරු</h3>
+      <div class="scheme-grid" id="specialGrid"></div>
+
+      <h3 class="sub-head">උදාහරණ</h3>
+      <div class="example-grid" id="exampleGrid"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Developed by <strong>V.P.R. Lakshan Vidanapathirana</strong> &middot; <a href="https://lakshan.vercel.app" target="_blank" rel="noopener">lakshan.vercel.app</a> &middot; <a href="mailto:rlvidanapathirana@gmail.com">rlvidanapathirana@gmail.com</a></p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
