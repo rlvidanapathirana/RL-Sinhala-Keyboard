@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>RL Sinhala Keyboard — සිංහල යතුරුපුවරුව සහ Font Converter</title>
-<meta name="description" content="Voice typing, Singlish to Unicode, word suggestions, FM Abhaya & ISI legacy font conversion — all in one tool by V.P.R. Lakshan Vidanapathirana.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RL Sinhala Keyboard — Type, Speak &amp; Convert Sinhala Instantly</title>
+<meta name="description" content="Voice typing, Singlish to Unicode, smart word prediction, and FM Abhaya / ISI legacy font conversion — all in one modern Sinhala typing tool.">
+<meta name="theme-color" content="#1B4332">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -12,24 +16,45 @@
 <body>
 
 <div class="bg-decor" aria-hidden="true">
-  <svg class="leaf leaf-1" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
-  <svg class="leaf leaf-2" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
-  <svg class="leaf leaf-3" viewBox="0 0 100 100"><path d="M50 5 C20 15, 10 45, 50 95 C90 45, 80 15, 50 5 Z"/></svg>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
 </div>
 
 <header class="site-header">
   <div class="header-inner">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 48 48"><path d="M24 4C12 4 6 16 6 26c0 11 8 18 18 18s18-7 18-18C42 16 36 4 24 4Z"/><text x="24" y="30" text-anchor="middle" class="brand-glyph">ල</text></svg>
+        <svg viewBox="0 0 512 512">
+          <defs>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2D6A4F"/><stop offset="100%" stop-color="#0F2B20"/>
+            </linearGradient>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#E8C766"/><stop offset="100%" stop-color="#C9A227"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="118" fill="url(#bgGrad)"/>
+          <text x="256" y="336" text-anchor="middle" font-family="'Noto Sans Sinhala',sans-serif" font-size="270" font-weight="700" fill="url(#goldGrad)">ල</text>
+          <rect x="150" y="378" width="212" height="14" rx="7" fill="url(#goldGrad)"/>
+          <circle cx="380" cy="140" r="10" fill="url(#goldGrad)"/>
+        </svg>
       </div>
       <div class="brand-text">
         <h1>RL Sinhala Keyboard</h1>
-        <p class="tagline">Singlish → Unicode → FM Abhaya / ISI, එකම තැනකින්</p>
+        <p class="tagline">Type. Speak. Convert. Instantly.</p>
       </div>
     </div>
     <div class="header-actions">
-      <span class="badge">v1.0</span>
+      <button class="icon-btn install-btn-labeled" id="installBtn" hidden title="Install app to your device">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="install-label">Install</span>
+      </button>
+      <button class="icon-btn" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .35 1.9l.05.05a2 2 0 1 1-2.9 2.9l-.05-.05a1.7 1.7 0 0 0-1.9-.35 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.9.35l-.05.05a2 2 0 1 1-2.9-2.9l.05-.05a1.7 1.7 0 0 0 .35-1.9 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.35-1.9l-.05-.05a2 2 0 1 1 2.9-2.9l.05.05a1.7 1.7 0 0 0 1.9.35H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.9-.35l.05-.05a2 2 0 1 1 2.9 2.9l-.05.05a1.7 1.7 0 0 0-.35 1.9V10a1.7 1.7 0 0 0 1.55 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="badge">v4.0</span>
     </div>
   </div>
 </header>
@@ -37,9 +62,9 @@
 <main class="wrap">
 
   <nav class="tabs" role="tablist" aria-label="Main navigation">
-    <button class="tab-btn active" data-tab="type" role="tab" aria-selected="true">⌨️ ටයිප් කරන්න</button>
+    <button class="tab-btn active" data-tab="type" role="tab" aria-selected="true">⌨️ Type</button>
     <button class="tab-btn" data-tab="convert" role="tab" aria-selected="false">🔄 Font Converter</button>
-    <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false">📖 උපදෙස්</button>
+    <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false">📖 Guide</button>
   </nav>
 
   <!-- ================= TYPE TAB ================= -->
@@ -47,19 +72,23 @@
     <div class="card editor-card">
 
       <div class="editor-toolbar">
-        <button class="tool-btn mic-btn" id="micBtn" title="Voice Typing (si-LK)">
+        <button class="tool-btn mic-btn" id="micBtn" title="Voice Typing">
           <svg viewBox="0 0 24 24" class="icon-mic"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 18v3" stroke="currentColor" stroke-width="1.8"/></svg>
-          <span>හඬ ටයිප්</span>
+          <span>Voice Type</span>
         </button>
+        <div class="mic-lang-toggle" id="micLangToggle" title="Voice typing language">
+          <button type="button" data-lang="si-LK" class="active">සිං</button>
+          <button type="button" data-lang="en-US">EN</button>
+        </div>
 
         <button class="tool-btn" id="kbToggleBtn" title="Show virtual keyboard">
           <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 10h1M8 10h1M11 10h1M14 10h1M17 10h1M5 14h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          <span>යතුරුපුවරුව</span>
+          <span>Keyboard</span>
         </button>
 
-        <div class="tool-sep"></div>
+        <div class="tool-sep hide-mobile"></div>
 
-        <label class="tool-select-label" for="outputFontMode">Copy සඳහා ෆොන්ට් එක:</label>
+        <label class="tool-select-label hide-mobile" for="outputFontMode">Copy as:</label>
         <select id="outputFontMode" class="tool-select">
           <option value="uni">Unicode</option>
           <option value="fm">FM Abhaya</option>
@@ -75,24 +104,27 @@
       </div>
 
       <div class="mic-status" id="micStatus" hidden>
-        <span class="mic-dot"></span> <span id="micStatusText">ඇහුම්කන් දෙමින්… කථා කරන්න</span>
+        <span class="mic-dot"></span> <span id="micStatusText">Listening… speak now</span>
+      </div>
+      <div class="mic-unsupported" id="micUnsupported" hidden>
+        Voice typing isn't supported in this browser. It works best in <strong>Chrome</strong> (desktop or Android). iPhone Safari doesn't yet support Sinhala speech recognition.
       </div>
 
       <div class="editor-body">
         <textarea id="editor" class="sinhala-editor" rows="10" spellcheck="false"
-          placeholder="මෙතන ටයිප් කරන්න… (Singlish භාවිතා කරන්න — උදා: mama gedara yanawa)"></textarea>
-      </div>
+          placeholder="Start typing here in Singlish — e.g. mama gedara yanawa"></textarea>
 
-      <div class="suggestions-row" id="suggestionsRow" hidden>
-        <span class="sugg-label">යෝජනා:</span>
-        <div class="sugg-chips" id="suggChips"></div>
+        <div class="compose-popup" id="composePopup" hidden>
+          <div class="compose-preview" id="composePreview"></div>
+          <div class="compose-suggestions" id="composeSuggestions"></div>
+        </div>
       </div>
 
       <div class="virtual-keyboard" id="virtualKeyboard" hidden></div>
 
       <div class="editor-footer">
         <div class="counts">
-          <span id="charCount">0 අකුරු</span> · <span id="wordCount">0 වචන</span>
+          <span id="charCount">0 characters</span> · <span id="wordCount">0 words</span>
         </div>
         <div class="copy-actions">
           <button class="btn btn-outline" id="copyUnicodeBtn">Copy Unicode</button>
@@ -107,8 +139,8 @@
   <!-- ================= CONVERT TAB ================= -->
   <section class="tab-panel" id="panel-convert" role="tabpanel" hidden>
     <div class="card">
-      <h2 class="card-title">ෆොන්ට් Converter — Unicode ⇄ Legacy</h2>
-      <p class="card-sub">Unicode සිංහල පෙළ FM Abhaya / ISI වලට හෝ ඊට ප්‍රතිලෝමව convert කරන්න. Legacy පෙළ නිවැරදිව පෙන්වීමට ඔබේ document එකේ අදාළ ෆොන්ට් එක (FM Abhaya / ISI) install කර තිබිය යුතුයි.</p>
+      <h2 class="card-title">Font Converter — Unicode ⇄ Legacy</h2>
+      <p class="card-sub">Convert Unicode Sinhala text to FM Abhaya / ISI or back, in either direction. Legacy text will only display correctly in an app where the matching font is installed and applied.</p>
 
       <div class="convert-controls">
         <label for="convertDirection">Direction:</label>
@@ -128,22 +160,22 @@
             <label for="convertInput" id="convertInputLabel">Input (Unicode)</label>
             <button class="mini-btn" id="pasteInputBtn">Paste</button>
           </div>
-          <textarea id="convertInput" class="sinhala-editor" rows="9" placeholder="මෙතන පේළිය paste කරන්න හෝ ටයිප් කරන්න…"></textarea>
+          <textarea id="convertInput" class="sinhala-editor" rows="9" placeholder="Paste or type text here…"></textarea>
         </div>
         <div class="convert-col">
           <div class="convert-col-head">
             <label for="convertOutput" id="convertOutputLabel">Output (FM Abhaya)</label>
             <button class="mini-btn" id="copyOutputBtn">Copy</button>
           </div>
-          <textarea id="convertOutput" class="sinhala-editor legacy-preview" rows="9" readonly placeholder="Converted text මෙතන පෙන්වයි…"></textarea>
+          <textarea id="convertOutput" class="sinhala-editor legacy-preview" rows="9" readonly placeholder="Converted text appears here…"></textarea>
         </div>
       </div>
 
       <details class="font-preview-loader">
-        <summary>Legacy font එකෙන්ම බලන්න ඕන ද? (.ttf upload කරන්න — preview සඳහා පමණි)</summary>
+        <summary>Want to preview the real legacy glyphs? Upload a font file</summary>
         <div class="font-load-row">
           <input type="file" id="fontFileInput" accept=".ttf,.otf,.woff,.woff2">
-          <span class="hint-text">ඔබේ පරිගණකයේ ඇති FM Abhaya / ISI Wijesekara ෆොන්ට් ෆයිලය upload කළොත්, output preview එක එම ෆොන්ට් එකෙන් පෙන්වයි. Font ෆයිල් server එකට upload වෙන්නේ නෑ — browser එකේ පමණි.</span>
+          <span class="hint-text">Upload your FM Abhaya / ISI Wijesekara font file (.ttf) to preview the output in its real glyphs. The file stays in your browser only — nothing is uploaded anywhere.</span>
         </div>
       </details>
     </div>
@@ -152,23 +184,85 @@
   <!-- ================= GUIDE TAB ================= -->
   <section class="tab-panel" id="panel-guide" role="tabpanel" hidden>
     <div class="card">
-      <h2 class="card-title">Singlish ටයිප් කිරීමේ ක්‍රමය</h2>
-      <p class="card-sub">ඉංග්‍රීසි අකුරු වලින් ටයිප් කරද්දී, ඒවා ස්වයංක්‍රීයව සිංහල Unicode අකුරු බවට පරිවර්තනය වේ. පහත වගුවේ ඇති key scheme එක අනුව ටයිප් කරන්න.</p>
+      <h2 class="card-title">How Singlish Typing Works</h2>
+      <p class="card-sub">Type using English letters — they're converted to Sinhala Unicode automatically as you type. Use the key scheme below as a reference.</p>
 
       <div class="scheme-grid" id="schemeGrid"></div>
 
-      <h3 class="sub-head">විශේෂ අකුරු</h3>
+      <h3 class="sub-head">Special characters</h3>
       <div class="scheme-grid" id="specialGrid"></div>
 
-      <h3 class="sub-head">උදාහරණ</h3>
+      <h3 class="sub-head">Examples</h3>
       <div class="example-grid" id="exampleGrid"></div>
     </div>
   </section>
 
 </main>
 
+<!-- ================= SETTINGS DRAWER ================= -->
+<div class="drawer-overlay" id="drawerOverlay" hidden></div>
+<aside class="settings-drawer" id="settingsDrawer" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Settings</h2>
+    <button class="icon-btn" id="closeSettingsBtn" title="Close">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+
+    <div class="setting-row">
+      <div class="setting-label">
+        <span>Auto-copy to clipboard</span>
+        <small>Automatically copy your text whenever it changes</small>
+      </div>
+      <label class="switch"><input type="checkbox" id="setAutoCopy"><span class="slider"></span></label>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-label">
+        <span>Sound effects</span>
+        <small>Subtle sounds for key actions</small>
+      </div>
+      <label class="switch"><input type="checkbox" id="setSound"><span class="slider"></span></label>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-label">
+        <span>Dark mode</span>
+        <small>Switch to a low-light theme</small>
+      </div>
+      <label class="switch"><input type="checkbox" id="setDarkMode"><span class="slider"></span></label>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-label">
+        <span>Real-time conversion</span>
+        <small>Convert as you type, instead of after each word</small>
+      </div>
+      <label class="switch"><input type="checkbox" id="setRealtime" checked><span class="slider"></span></label>
+    </div>
+
+    <div class="setting-row column">
+      <div class="setting-label">
+        <span>Font size</span>
+        <small>Adjust the editor text size</small>
+      </div>
+      <div class="segmented" id="fontSizeSeg">
+        <button data-size="small">S</button>
+        <button data-size="medium" class="active">M</button>
+        <button data-size="large">L</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-outline" id="resetSettingsBtn">Reset to defaults</button>
+  </div>
+</aside>
+
 <footer class="site-footer">
-  <p>Developed by <strong>V.P.R. Lakshan Vidanapathirana</strong> &middot; <a href="https://lakshan.vercel.app" target="_blank" rel="noopener">lakshan.vercel.app</a> &middot; <a href="mailto:rlvidanapathirana@gmail.com">rlvidanapathirana@gmail.com</a></p>
+  <p>Developed by <a href="https://lakshan.vercel.app/" target="_blank" rel="noopener"><strong>V.P.R. Lakshan Vidanapathirana</strong></a></p>
+  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v4.0</p>
 </footer>
 
 <div class="toast" id="toast"></div>
