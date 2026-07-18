@@ -236,6 +236,11 @@ body{
 .example-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--tea-50); border-radius:10px; padding:10px 14px; align-items:center;}
 .example-row .in{font-family:var(--font-ui); font-size:13.5px; color:var(--ink-soft);}
 .example-row .out{font-family:var(--font-si); font-size:17px; color:var(--tea-500); font-weight:600;}
+.guide-list{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:10px;}
+.guide-list li{font-size:14px; line-height:1.6; color:var(--ink-soft);}
+.guide-list strong{color:var(--tea-500); font-family:var(--font-ui);}
+.guide-list code{background:var(--tea-50); color:var(--tea-700); padding:1px 6px; border-radius:5px; font-family:var(--font-ui); font-size:13px;}
+[data-theme="dark"] .guide-list code{color:var(--tea-400);}
 
 /* ---------- settings drawer ---------- */
 .drawer-overlay{position:fixed; inset:0; background:rgba(10,20,15,0.5); z-index:90; backdrop-filter:blur(2px);}

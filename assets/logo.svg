@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1B4332"/>
+      <stop offset="55%" stop-color="#22543D"/>
+      <stop offset="100%" stop-color="#0F2B20"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8C766"/>
+      <stop offset="100%" stop-color="#C9A227"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <rect x="18" y="18" width="476" height="476" rx="104" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+  <text x="256" y="336" text-anchor="middle" font-family="'Noto Sans Sinhala', sans-serif" font-size="270" font-weight="700" fill="url(#gold)">ල</text>
+  <rect x="150" y="378" width="212" height="14" rx="7" fill="url(#gold)" opacity="0.9"/>
+  <circle cx="380" cy="140" r="10" fill="url(#gold)"/>
+</svg>

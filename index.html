@@ -54,7 +54,7 @@
       <button class="icon-btn" id="settingsBtn" title="Settings">
         <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .35 1.9l.05.05a2 2 0 1 1-2.9 2.9l-.05-.05a1.7 1.7 0 0 0-1.9-.35 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.9.35l-.05.05a2 2 0 1 1-2.9-2.9l.05-.05a1.7 1.7 0 0 0 .35-1.9 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.35-1.9l-.05-.05a2 2 0 1 1 2.9-2.9l.05.05a1.7 1.7 0 0 0 1.9.35H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.9-.35l.05-.05a2 2 0 1 1 2.9 2.9l-.05.05a1.7 1.7 0 0 0-.35 1.9V10a1.7 1.7 0 0 0 1.55 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       </button>
-      <span class="badge">v4.0</span>
+      <span class="badge">v4.1</span>
     </div>
   </div>
 </header>
@@ -194,6 +194,33 @@
 
       <h3 class="sub-head">Examples</h3>
       <div class="example-grid" id="exampleGrid"></div>
+
+      <h3 class="sub-head">How suggestions are generated</h3>
+      <ol class="guide-list">
+        <li>As you type a word in Singlish (e.g. <code>shakthiya</code>), the engine converts it phonetically to Sinhala Unicode in real time — that's what appears in the text box and at the top of the popup.</li>
+        <li>The popup then checks your exact typed word against a 145,000-entry Singlish → Sinhala dictionary for verified real-word spellings — these are usually more accurate than the phonetic guess alone.</li>
+        <li>It also looks for longer dictionary words that <em>start with</em> what you've typed so far, so a short prefix like <code>patam</code> can predict a full word like <strong>පාඨමාලාව</strong>.</li>
+        <li>If the dictionary has too few matches, frequency-ranked predictions from a 30,000-word corpus fill in the rest.</li>
+        <li>Your raw typed text is always offered as the last numbered option, so you can keep it exactly as typed (useful for names or English words).</li>
+      </ol>
+
+      <h3 class="sub-head">Using the suggestion popup</h3>
+      <ol class="guide-list">
+        <li>As you type, a popup appears above (or below, near a screen edge) your cursor showing up to 8 suggestions.</li>
+        <li>The top suggestion is the one currently shown inline in the text box.</li>
+        <li>Press <strong>1–9</strong> on your keyboard to instantly pick a specific suggestion.</li>
+        <li>Press <strong>Space</strong> or just keep typing to accept what's currently shown and move on.</li>
+        <li>Use <strong>↑ / ↓</strong> to highlight a different suggestion, then <strong>Enter</strong> to accept it.</li>
+        <li>Click any suggestion with your mouse or finger to select it.</li>
+      </ol>
+
+      <h3 class="sub-head">If the word you want isn't suggested</h3>
+      <ol class="guide-list">
+        <li>Try a different spelling variant — e.g. <code>kohomada</code> vs <code>kohomadha</code> can give different results, since single vs. doubled/aspirated letters map to different Sinhala consonants (see the scheme table above).</li>
+        <li>Keep typing further into the word — longer prefixes narrow the dictionary match considerably.</li>
+        <li>For rare words or proper nouns, the phonetic conversion is usually close — just edit it by hand afterwards.</li>
+        <li>Try voice typing for words that are awkward to spell out phonetically.</li>
+      </ol>
     </div>
   </section>
 
@@ -262,7 +289,7 @@
 
 <footer class="site-footer">
   <p>Developed by <a href="https://lakshan.vercel.app/" target="_blank" rel="noopener"><strong>V.P.R. Lakshan Vidanapathirana</strong></a></p>
-  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v4.0</p>
+  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v4.1</p>
 </footer>
 
 <div class="toast" id="toast"></div>

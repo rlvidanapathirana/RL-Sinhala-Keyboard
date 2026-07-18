@@ -1,25 +1,24 @@
-# RL Sinhala Keyboard — V4.0
+# RL Sinhala Keyboard — V4.1
 
-A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary, bilingual voice typing, Google-style numbered word prediction, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
+A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary, bilingual voice + keyboard typing, Google-style numbered word prediction, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V4.0
+## What's new in V4.1
 
-- 📚 **Real dictionary-backed suggestions.** Predictions are no longer just the transliteration engine's best guess — they're now checked against a 145,000-entry Singlish→Sinhala dictionary (built from your RL Dictionary project's word data), so words like `gedara` now correctly offer **ගෙදර** as a verified option alongside the engine's own guess, not just whatever the regex scheme produces.
-- 🔢 **Redesigned suggestion popup** — now a vertical numbered list matching Google Input Tools' own layout exactly: dictionary-verified spellings first, then close predictions, and your original typed text always offered as the last numbered option so you can keep it as-is (e.g. for English words or names).
-- 🌐 **Voice language switch no longer risks losing dictation.** Switching between Sinhala/English mid-recording now waits for the previous session to fully close before restarting (instead of a fixed timer), which was causing silent failures where nothing got typed.
-- ✍️ **Auto full-stop in voice typing** — each spoken phrase (i.e. each pause-separated segment) now automatically gets a period at the end if it doesn't already end with punctuation.
-- 🎨 **Richer animated background** — a fourth drifting gradient blob and smoother, more organic motion for a more premium "green cloud" feel.
-- 📲 **Clearer Install button** — now labeled "Install" on desktop, not just an icon.
+- 🔤 **Fixed yansaya conjuncts** (e.g. `vidya` → විද්‍යා). Previously, a consonant followed by plain `y` didn't get the zero-width joiner needed to form a proper conjunct, so words like this rendered as two separate letters instead of one joined glyph. This now happens automatically, the same way rakaransha (`r`) already did.
+- 🔮 **Prefix-completion predictions.** Suggestions no longer just show the literal conversion of what you've typed — they now also search the dictionary for longer real words that *start with* your prefix, so typing `patam` correctly predicts **පාඨමාලාව**, not just පඨම්.
+- 🌐 **The සිං/EN toggle now controls keyboard typing too**, not just voice. Switch to EN and typed letters stay plain English — no more fighting the transliteration engine to type an English word.
+- ⚡ **Smoother, faster live typing.** The caret-position calculation (used to position the suggestion popup) was recreating a DOM element on every single keystroke — that's fixed to reuse one cached element instead, which was the main source of typing lag. The transliteration engine's regular expressions are now also precompiled once at startup rather than rebuilt on every keystroke.
+- 📖 **Guide tab expanded** — a full "how suggestions work", "using the popup", and "if the word isn't suggested" section, plus documentation for the new automatic yansaya behavior.
 
 ## Features
 
-- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type (word-scoped composition, so multi-letter phonemes like `th`, `sh`, `kh` never get corrupted mid-word).
-- 🎙️ **Bilingual voice typing**: Sinhala (si-LK) or English (en-US) speech-to-text via the Web Speech API (Chrome recommended; not yet supported on iOS Safari), with automatic sentence-ending punctuation.
+- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type (word-scoped composition, so multi-letter phonemes like `th`, `sh`, `kh`, and now `y`-conjuncts like `dya`, never get corrupted mid-word).
+- 🎙️ **Bilingual voice + keyboard typing**: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
 - 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
-- 💡 **Word prediction**: dictionary-verified spellings first (145,000 entries), frequency-ranked fallback predictions from a 30,000-word corpus, and your raw typed text always available as a fallback option.
+- 💡 **Word prediction**: dictionary-verified spellings first (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
 - 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, using a 1,600+ entry mapping table with longest-match substitution.
 - 📋 **Copy as…**: copy your text as Unicode, FM Abhaya, or ISI directly.
 - ⌨️ **On-screen virtual keyboard** for direct Sinhala glyph entry.

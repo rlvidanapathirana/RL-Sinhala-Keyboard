@@ -35,22 +35,49 @@
   ];
   const SPECIAL_CHAR = [["ruu", "ෲ"], ["ru", "ෘ"]];
 
+  // All regexes are compiled once here instead of on every keystroke — this is what
+  // keeps live typing fast even as the transliteration rule set has grown.
+  function buildRules() {
+    const rules = {
+      specialChar: [], rakaransha: [], rakaranshaBare: [],
+      yansaya: [], yansayaBare: [], consonantVowel: [], consonantBare: [], vowel: []
+    };
+    for (const [sc, scu] of SPECIAL_CHAR) {
+      for (const [c, cu] of CONSONANTS) rules.specialChar.push([new RegExp(c + sc, "g"), cu + scu]);
+    }
+    // Rakaransha: consonant + r + vowel -> conjunct r (e.g. kra -> ක්‍ර)
+    for (const [c, cu] of CONSONANTS) {
+      for (const [v, , vm] of VOWELS) rules.rakaransha.push([new RegExp(c + "r" + v, "g"), cu + "්\u200Dර" + vm]);
+      rules.rakaranshaBare.push([new RegExp(c + "r", "g"), cu + "්\u200Dර"]);
+    }
+    // Yansaya: consonant + y + vowel -> conjunct y (e.g. vidya -> වි ද් + ZWJ + ය + ා = විද්‍යා)
+    // This runs automatically for plain "y" now, so you don't need the old \y / Y escape
+    // just to get a properly-joined conjunct in the middle of a word.
+    for (const [c, cu] of CONSONANTS) {
+      for (const [v, , vm] of VOWELS) rules.yansaya.push([new RegExp(c + "y" + v, "g"), cu + "්\u200Dය" + vm]);
+      rules.yansayaBare.push([new RegExp(c + "y", "g"), cu + "්\u200Dය"]);
+    }
+    for (const [c, cu] of CONSONANTS) {
+      for (const [v, , vm] of VOWELS) rules.consonantVowel.push([new RegExp(c + v, "g"), cu + vm]);
+    }
+    for (const [c, cu] of CONSONANTS) rules.consonantBare.push([new RegExp(c, "g"), cu + "්"]);
+    for (const [v, vu] of VOWELS) rules.vowel.push([new RegExp(v, "g"), vu]);
+    return rules;
+  }
+  const RULES = buildRules();
+
   function transliterate(input) {
     if (!input) return input;
     let text = input;
     for (const [re, rep] of SPECIAL_CONSONANTS) text = text.replace(re, rep);
-    for (const [sc, scu] of SPECIAL_CHAR) {
-      for (const [c, cu] of CONSONANTS) text = text.replace(new RegExp(c + sc, "g"), cu + scu);
-    }
-    for (const [c, cu] of CONSONANTS) {
-      for (const [v, , vm] of VOWELS) text = text.replace(new RegExp(c + "r" + v, "g"), cu + "්\u200Dර" + vm);
-      text = text.replace(new RegExp(c + "r", "g"), cu + "්\u200Dර");
-    }
-    for (const [c, cu] of CONSONANTS) {
-      for (const [v, , vm] of VOWELS) text = text.replace(new RegExp(c + v, "g"), cu + vm);
-    }
-    for (const [c, cu] of CONSONANTS) text = text.replace(new RegExp(c, "g"), cu + "්");
-    for (const [v, vu] of VOWELS) text = text.replace(new RegExp(v, "g"), vu);
+    for (const [re, rep] of RULES.specialChar) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.rakaransha) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.rakaranshaBare) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.yansaya) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.yansayaBare) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.consonantVowel) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.consonantBare) text = text.replace(re, rep);
+    for (const [re, rep] of RULES.vowel) text = text.replace(re, rep);
     return text;
   }
 
@@ -112,10 +139,27 @@
    * 4. DATA LOADING (mapping + frequency-ranked word list)
    * -------------------------------------------------------------------- */
   const state = {
-    mapping: [], words: [], fuzzy: new Map(),
+    mapping: [], words: [], fuzzy: new Map(), fuzzyKeysSorted: [],
     uniToFm: new Map(), uniToIsi: new Map(), fmToUni: new Map(), isiToUni: new Map(),
     maxUniLen: 1, maxFmLen: 1, maxIsiLen: 1
   };
+
+  // Binary-search a sorted string array for all entries starting with `prefix`,
+  // capped at `limit`. Used to power "complete the word" style predictions
+  // (e.g. typing "patam" finds the dictionary entry for "patamalava").
+  function prefixSearchSorted(sortedArr, prefix, limit) {
+    let lo = 0, hi = sortedArr.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (sortedArr[mid] < prefix) lo = mid + 1; else hi = mid;
+    }
+    const out = [];
+    for (let i = lo; i < sortedArr.length && out.length < limit; i++) {
+      if (!sortedArr[i].startsWith(prefix)) break;
+      out.push(sortedArr[i]);
+    }
+    return out;
+  }
 
   function buildLongestMatchMap(pairs, keyIdx, valIdx) {
     const map = new Map(); let maxLen = 1;
@@ -160,6 +204,7 @@
     // typing/suggestions work fine before this resolves, using the live engine only.
     fetch("fuzzy.json").then(r => r.json()).then(obj => {
       state.fuzzy = new Map(Object.entries(obj));
+      state.fuzzyKeysSorted = [...state.fuzzy.keys()].sort();
     }).catch(() => { /* dictionary-backed suggestions unavailable, live engine still works */ });
   }
   function toFm(t) { return longestMatchConvert(t, state.uniToFm, state.maxUniLen); }
@@ -256,24 +301,34 @@
     updateCounts();
   }
 
-  /* ---- caret pixel position via mirror element ---- */
+  /* ---- caret pixel position via mirror element (cached & reused for smooth typing) ---- */
   const MIRROR_PROPS = ["boxSizing", "width", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth",
     "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "fontStyle", "fontVariant", "fontWeight", "fontSize",
     "lineHeight", "fontFamily", "textAlign", "textTransform", "textIndent", "letterSpacing", "wordSpacing", "tabSize", "whiteSpace", "wordBreak"];
+  let mirrorDiv = null, mirrorSpan = null, mirrorSyncedWidth = "";
   function getCaretCoords(el, position) {
-    const div = document.createElement("div");
+    if (!mirrorDiv) {
+      mirrorDiv = document.createElement("div");
+      mirrorDiv.style.position = "absolute";
+      mirrorDiv.style.visibility = "hidden";
+      mirrorDiv.style.whiteSpace = "pre-wrap";
+      mirrorDiv.style.wordWrap = "break-word";
+      mirrorDiv.style.top = "0"; mirrorDiv.style.left = "-9999px";
+      mirrorSpan = document.createElement("span");
+      mirrorDiv.appendChild(mirrorSpan);
+      document.body.appendChild(mirrorDiv);
+    }
     const style = getComputedStyle(el);
-    div.style.position = "absolute"; div.style.visibility = "hidden"; div.style.whiteSpace = "pre-wrap"; div.style.wordWrap = "break-word";
-    MIRROR_PROPS.forEach(p => { div.style[p] = style[p]; });
-    div.style.width = style.width;
-    document.body.appendChild(div);
-    div.textContent = el.value.substring(0, position);
-    const span = document.createElement("span");
-    span.textContent = el.value.substring(position) || ".";
-    div.appendChild(span);
-    const coords = { top: span.offsetTop, left: span.offsetLeft };
-    document.body.removeChild(div);
-    return coords;
+    // Only re-sync full style set when the editor's own box size actually changes
+    // (e.g. on resize), not on every keystroke — width is what most affects wrapping.
+    if (style.width !== mirrorSyncedWidth) {
+      MIRROR_PROPS.forEach(p => { mirrorDiv.style[p] = style[p]; });
+      mirrorSyncedWidth = style.width;
+    }
+    mirrorDiv.textContent = el.value.substring(0, position);
+    mirrorSpan.textContent = el.value.substring(position) || ".";
+    mirrorDiv.appendChild(mirrorSpan);
+    return { top: mirrorSpan.offsetTop, left: mirrorSpan.offsetLeft };
   }
 
   function showComposePopup(cursorPos, previewText, rawWord) {
@@ -318,15 +373,30 @@
     let candidates = [];
     const key = (rawWord || "").toLowerCase();
 
-    // 1. Real dictionary-verified spellings for this exact Singlish word (best quality)
+    // 1. Real dictionary-verified spelling(s) for exactly what's typed so far (best quality —
+    //    this is what fixes cases like "gedara" wrongly guessing ගෙඩර instead of ගෙදර).
     if (key && state.fuzzy.has(key)) candidates.push(...state.fuzzy.get(key));
 
     // 2. The live transliteration engine's own conversion (keeps popup consistent with the bubble)
-    if (previewText && !candidates.includes(previewText)) candidates.unshift(previewText);
+    if (previewText && !candidates.includes(previewText)) candidates.push(previewText);
+
+    // 3. Prefix completion: find longer real dictionary words that START with what you've
+    //    typed so far, e.g. typing "patam" finds "patamalava" -> පාඨමාලාව. This is what lets
+    //    a short prefix predict a full, common word instead of just literally converting
+    //    the letters typed up to that point.
+    if (key && key.length >= 3 && state.fuzzyKeysSorted.length) {
+      const prefixKeys = prefixSearchSorted(state.fuzzyKeysSorted, key, 12);
+      for (const pk of prefixKeys) {
+        if (pk === key) continue;
+        const vals = state.fuzzy.get(pk);
+        if (vals && vals[0] && !candidates.includes(vals[0])) candidates.push(vals[0]);
+        if (candidates.length >= 8) break;
+      }
+    }
 
     candidates = [...new Set(candidates)];
 
-    // 3. If we still have few options, fill in with frequency-ranked predictions sharing the same prefix
+    // 4. If we still have few options, fill in with frequency-ranked predictions sharing the same prefix
     if (candidates.length < 4 && previewText && state.words.length) {
       for (let i = 0; i < state.words.length && candidates.length < 8; i++) {
         if (state.words[i].startsWith(previewText) && !candidates.includes(state.words[i])) {
@@ -336,7 +406,7 @@
     }
     candidates = candidates.slice(0, 8);
 
-    // 4. Always offer the raw typed text as the last option (Google Input Tools style "keep as-is")
+    // 5. Always offer the raw typed text as the last option (Google Input Tools style "keep as-is")
     let rawOptionIndex = -1;
     if (rawWord && !candidates.includes(rawWord)) {
       candidates.push(rawWord);
@@ -381,6 +451,13 @@
 
   editor.addEventListener("beforeinput", (e) => {
     const type = e.inputType;
+
+    /* ---- English mode: the සිං/EN toggle now also controls keyboard typing,
+       not just voice — when EN is active, typed letters are left exactly as typed. ---- */
+    if (settings.voiceLang === "en-US") {
+      if (pending) resetPending();
+      return; // let the browser insert the character normally, no transliteration
+    }
 
     /* ---- Non-real-time mode: convert only at word boundaries ---- */
     if (!settings.realtime) {
@@ -515,6 +592,7 @@
     settings.voiceLang = btn.dataset.lang;
     saveSettings();
     sfx.toggle();
+    if (pending) resetPending(); // only stops tracking the in-progress word; text already on screen is untouched
     if (isRecording) {
       // Never touch editor.value here — only the recognizer is restarted with the new
       // language. The restart itself happens from onend, once the old session has
@@ -731,8 +809,9 @@
   ];
   const SPECIAL_ITEMS = [
     ["\\n", "ං (Anusvara)"], ["\\h", "ඃ (Visarga)"], ["\\N", "ඞ"], ["\\R", "ඍ"],
-    ["R / \\r", "ර්‍ (Repaya)"], ["Y", "‍ය (Yansaya)"],
+    ["R / \\r", "ර්‍ (Repaya)"],
     ["Xr + vowel", "X්‍ර… (Rakaransha) — e.g. kra → ක්‍ර"],
+    ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. vidya → විද්‍යා"],
     ["Xru", "Xෘ — e.g. kru → කෘ"], ["Xruu", "Xෲ — e.g. kruu → කෲ"]
   ];
   const EXAMPLE_ITEMS = [
@@ -740,7 +819,8 @@
     ["oyage nama mokakdha", "ඔයගෙ නම මොකක්ද"],
     ["subha aluth avurudhak", "සුභ අලුත් අවුරුද්දක්"],
     ["sri lanka", "ශ්‍රී ලංකා"],
-    ["kohomadha", "කොහොමද"]
+    ["kohomadha", "කොහොමද"],
+    ["vidyava", "විද්‍යාව"]
   ];
   function buildGuideTables() {
     document.getElementById("schemeGrid").innerHTML = SCHEME_ITEMS.map(([k, v]) =>
