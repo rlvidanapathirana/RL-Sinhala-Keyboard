@@ -244,6 +244,7 @@
   const panels = {
     type: document.getElementById("panel-type"),
     convert: document.getElementById("panel-convert"),
+    dictionary: document.getElementById("panel-dictionary"),
     guide: document.getElementById("panel-guide")
   };
   tabBtns.forEach(btn => {
@@ -256,6 +257,7 @@
         el.classList.toggle("active", show);
       });
       hideComposePopup();
+      if (btn.dataset.tab === "dictionary") ensureMeaningsLoaded();
     });
   });
 
@@ -305,7 +307,7 @@
   const MIRROR_PROPS = ["boxSizing", "width", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth",
     "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "fontStyle", "fontVariant", "fontWeight", "fontSize",
     "lineHeight", "fontFamily", "textAlign", "textTransform", "textIndent", "letterSpacing", "wordSpacing", "tabSize", "whiteSpace", "wordBreak"];
-  let mirrorDiv = null, mirrorSpan = null, mirrorSyncedWidth = "";
+  let mirrorDiv = null, mirrorSpan = null, mirrorSyncedKey = "";
   function getCaretCoords(el, position) {
     if (!mirrorDiv) {
       mirrorDiv = document.createElement("div");
@@ -319,11 +321,12 @@
       document.body.appendChild(mirrorDiv);
     }
     const style = getComputedStyle(el);
-    // Only re-sync full style set when the editor's own box size actually changes
-    // (e.g. on resize), not on every keystroke — width is what most affects wrapping.
-    if (style.width !== mirrorSyncedWidth) {
+    // Re-sync the full style set only when box size or font actually changed (e.g. on
+    // resize or the Font Size setting) — not on every keystroke.
+    const syncKey = style.width + "|" + style.fontSize + "|" + style.fontFamily + "|" + style.lineHeight;
+    if (syncKey !== mirrorSyncedKey) {
       MIRROR_PROPS.forEach(p => { mirrorDiv.style[p] = style[p]; });
-      mirrorSyncedWidth = style.width;
+      mirrorSyncedKey = syncKey;
     }
     mirrorDiv.textContent = el.value.substring(0, position);
     mirrorSpan.textContent = el.value.substring(position) || ".";
@@ -747,16 +750,74 @@
   const convertInputLabel = document.getElementById("convertInputLabel");
   const convertOutputLabel = document.getElementById("convertOutputLabel");
   const DIRECTION_LABELS = {
-    uni2fm: ["Input (Unicode)", "Output (FM Abhaya)"], uni2isi: ["Input (Unicode)", "Output (ISI)"],
+    uni2fm: ["Input (type Singlish or paste Unicode)", "Output (FM Abhaya)"],
+    uni2isi: ["Input (type Singlish or paste Unicode)", "Output (ISI)"],
     fm2uni: ["Input (FM Abhaya)", "Output (Unicode)"], isi2uni: ["Input (ISI)", "Output (Unicode)"]
   };
   function updateConvertLabels() {
     const [inLabel, outLabel] = DIRECTION_LABELS[convertDirection.value];
     convertInputLabel.textContent = inLabel; convertOutputLabel.textContent = outLabel;
     convertOutput.classList.toggle("legacy-preview", convertDirection.value.startsWith("uni2"));
+    convertInput.placeholder = convertDirection.value.startsWith("uni2")
+      ? "Type in Singlish (e.g. mama gedara yanawa) or paste Unicode text…"
+      : "Paste or type legacy text here…";
   }
   convertDirection.addEventListener("change", updateConvertLabels);
   updateConvertLabels();
+
+  // Reusable lightweight version of the live word-composing engine (no popup/suggestions —
+  // just conversion), so the converter's own input box can also be typed in Singlish.
+  function attachLiveTransliteration(textarea, isEnabled, onChange) {
+    let pend = "", pendStart = null, prevLen = 0;
+    const atEnd = () => pendStart !== null && textarea.selectionStart === pendStart + prevLen && textarea.selectionEnd === pendStart + prevLen;
+    const reset = () => { pend = ""; pendStart = null; prevLen = 0; };
+    const render = () => {
+      const preview = transliterate(pend);
+      const before = textarea.value.slice(0, pendStart), after = textarea.value.slice(pendStart + prevLen);
+      textarea.value = before + preview + after;
+      prevLen = preview.length;
+      const pos = pendStart + prevLen;
+      textarea.setSelectionRange(pos, pos);
+      onChange();
+    };
+    textarea.addEventListener("beforeinput", (e) => {
+      if (!isEnabled()) { reset(); return; }
+      const type = e.inputType;
+      if (type === "insertText" && e.data) {
+        if (pend && !atEnd()) reset();
+        const isWordChar = [...e.data].every(ch => LATIN_WORD_CHAR.test(ch));
+        if (isWordChar) {
+          e.preventDefault();
+          if (pendStart === null) {
+            const s = textarea.selectionStart, en = textarea.selectionEnd;
+            if (en > s) textarea.value = textarea.value.slice(0, s) + textarea.value.slice(en);
+            pendStart = s;
+          }
+          pend += e.data;
+          render();
+        } else { reset(); }
+        return;
+      }
+      if (type === "deleteContentBackward") {
+        if (pend && atEnd()) {
+          e.preventDefault();
+          pend = pend.slice(0, -1);
+          if (!pend) {
+            const before = textarea.value.slice(0, pendStart), after = textarea.value.slice(pendStart + prevLen);
+            textarea.value = before + after;
+            textarea.setSelectionRange(pendStart, pendStart);
+            reset(); onChange();
+          } else { render(); }
+        } else { reset(); }
+        return;
+      }
+      reset();
+    });
+    textarea.addEventListener("blur", () => { if (pend) reset(); });
+    textarea.addEventListener("click", () => { if (pend && !atEnd()) reset(); });
+  }
+  attachLiveTransliteration(convertInput, () => convertDirection.value.startsWith("uni2"), () => runConvert());
+
   function runConvert() {
     const val = convertInput.value; let out = "";
     switch (convertDirection.value) {
@@ -794,7 +855,90 @@
   });
 
   /* ----------------------------------------------------------------------
-   * 12. GUIDE TAB
+   * 12. DICTIONARY — English <-> Sinhala lookup (double-click in editor, or search tab)
+   * -------------------------------------------------------------------- */
+  const dictSearchInput = document.getElementById("dictSearchInput");
+  const dictSearchBtn = document.getElementById("dictSearchBtn");
+  const dictStatus = document.getElementById("dictStatus");
+  const dictResults = document.getElementById("dictResults");
+  const SINHALA_RE = /[\u0D80-\u0DFF]/;
+
+  let meaningsLoadState = "idle"; // idle | loading | ready | error
+  function ensureMeaningsLoaded() {
+    if (meaningsLoadState === "ready" || meaningsLoadState === "loading") return;
+    meaningsLoadState = "loading";
+    dictStatus.hidden = false;
+    dictStatus.textContent = "Loading dictionary (first time only)…";
+    Promise.all([
+      fetch("meanings.json").then(r => r.json()),
+      fetch("meanings_si.json").then(r => r.json())
+    ]).then(([enSi, siEn]) => {
+      state.meaningsEnSi = enSi;
+      state.meaningsSiEn = siEn;
+      meaningsLoadState = "ready";
+      dictStatus.hidden = true;
+    }).catch(() => {
+      meaningsLoadState = "error";
+      dictStatus.textContent = "Couldn't load the dictionary — check your connection and try again.";
+    });
+  }
+
+  function lookupMeaning(word) {
+    if (!word || meaningsLoadState !== "ready") return null;
+    const trimmed = word.trim();
+    if (!trimmed) return null;
+    if (SINHALA_RE.test(trimmed)) {
+      const hit = state.meaningsSiEn[trimmed];
+      return hit ? { word: trimmed, direction: "si→en", meanings: hit } : null;
+    }
+    const lower = trimmed.toLowerCase();
+    const hit = state.meaningsEnSi[lower] || state.meaningsEnSi[trimmed];
+    return hit ? { word: trimmed, direction: "en→si", meanings: hit } : null;
+  }
+
+  function renderDictResults(result, queryWord) {
+    if (!result) {
+      dictResults.innerHTML = `<div class="dict-empty">No entry found for "<strong>${queryWord}</strong>". Try a different spelling.</div>`;
+      return;
+    }
+    const chips = result.meanings.slice(0, 20).map(m => `<span class="dict-meaning-chip">${m}</span>`).join("");
+    dictResults.innerHTML = `
+      <div class="dict-entry">
+        <div class="dict-entry-word">${result.word} <span class="dict-entry-dir">${result.direction}</span></div>
+        <div class="dict-meaning-list">${chips}</div>
+      </div>`;
+  }
+
+  function runDictSearch() {
+    const q = dictSearchInput.value.trim();
+    if (!q) return;
+    if (meaningsLoadState !== "ready") { ensureMeaningsLoaded(); return; }
+    renderDictResults(lookupMeaning(q), q);
+  }
+  dictSearchBtn.addEventListener("click", runDictSearch);
+  dictSearchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") runDictSearch(); });
+  dictSearchInput.addEventListener("focus", ensureMeaningsLoaded);
+
+  // Double-click a word anywhere in the main editor to see its meaning — loads the
+  // dictionary lazily on first use so it never slows down initial typing.
+  editor.addEventListener("dblclick", () => {
+    const word = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+    if (!word || /\s/.test(word)) return;
+    if (meaningsLoadState !== "ready") {
+      ensureMeaningsLoaded();
+      showToast("Loading dictionary… double-click the word again in a moment");
+      return;
+    }
+    const result = lookupMeaning(word);
+    if (result) {
+      showToast(word + " — " + result.meanings.slice(0, 3).join(", "));
+    } else {
+      showToast("No dictionary entry for \"" + word + "\"");
+    }
+  });
+
+  /* ----------------------------------------------------------------------
+   * 13. GUIDE TAB
    * -------------------------------------------------------------------- */
   const SCHEME_ITEMS = [
     ["a", "අ"], ["aa", "ආ"], ["A / ae", "ඇ"], ["Aa", "ඈ"], ["i", "ඉ"], ["ii / ee", "ඊ"],

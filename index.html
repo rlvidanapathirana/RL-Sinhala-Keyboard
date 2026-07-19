@@ -54,7 +54,7 @@
       <button class="icon-btn" id="settingsBtn" title="Settings">
         <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .35 1.9l.05.05a2 2 0 1 1-2.9 2.9l-.05-.05a1.7 1.7 0 0 0-1.9-.35 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.9.35l-.05.05a2 2 0 1 1-2.9-2.9l.05-.05a1.7 1.7 0 0 0 .35-1.9 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.35-1.9l-.05-.05a2 2 0 1 1 2.9-2.9l.05.05a1.7 1.7 0 0 0 1.9.35H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.9-.35l.05-.05a2 2 0 1 1 2.9 2.9l-.05.05a1.7 1.7 0 0 0-.35 1.9V10a1.7 1.7 0 0 0 1.55 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       </button>
-      <span class="badge">v4.1</span>
+      <span class="badge">v5.0</span>
     </div>
   </div>
 </header>
@@ -64,6 +64,7 @@
   <nav class="tabs" role="tablist" aria-label="Main navigation">
     <button class="tab-btn active" data-tab="type" role="tab" aria-selected="true">⌨️ Type</button>
     <button class="tab-btn" data-tab="convert" role="tab" aria-selected="false">🔄 Font Converter</button>
+    <button class="tab-btn" data-tab="dictionary" role="tab" aria-selected="false">📘 Dictionary</button>
     <button class="tab-btn" data-tab="guide" role="tab" aria-selected="false">📖 Guide</button>
   </nav>
 
@@ -181,10 +182,26 @@
     </div>
   </section>
 
+  <!-- ================= DICTIONARY TAB ================= -->
+  <section class="tab-panel" id="panel-dictionary" role="tabpanel" hidden>
+    <div class="card">
+      <h2 class="card-title">Dictionary — English ⇄ Sinhala</h2>
+      <p class="card-sub">Search in English or Sinhala — the language is detected automatically from what you type. Built from a 130,000+ entry bilingual dictionary; works fully offline once loaded. Tip: double-click any word in the Type tab to look it up instantly.</p>
+
+      <div class="dict-search-row">
+        <input type="text" id="dictSearchInput" class="tool-select dict-search-input" placeholder="Type a word in English or Sinhala…" autocomplete="off">
+        <button class="btn btn-primary" id="dictSearchBtn">Search</button>
+      </div>
+      <div class="dict-status" id="dictStatus" hidden></div>
+      <div class="dict-results" id="dictResults"></div>
+    </div>
+  </section>
+
   <!-- ================= GUIDE TAB ================= -->
   <section class="tab-panel" id="panel-guide" role="tabpanel" hidden>
     <div class="card">
       <h2 class="card-title">How Singlish Typing Works</h2>
+
       <p class="card-sub">Type using English letters — they're converted to Sinhala Unicode automatically as you type. Use the key scheme below as a reference.</p>
 
       <div class="scheme-grid" id="schemeGrid"></div>
@@ -289,7 +306,7 @@
 
 <footer class="site-footer">
   <p>Developed by <a href="https://lakshan.vercel.app/" target="_blank" rel="noopener"><strong>V.P.R. Lakshan Vidanapathirana</strong></a></p>
-  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v4.1</p>
+  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v5.0</p>
 </footer>
 
 <div class="toast" id="toast"></div>

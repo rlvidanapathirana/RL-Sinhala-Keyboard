@@ -227,6 +227,19 @@ body{
 .font-load-row{margin-top:12px; display:flex; flex-direction:column; gap:8px;}
 .hint-text{font-size:12px; color:var(--ink-soft); line-height:1.5;}
 
+/* ---------- dictionary tab ---------- */
+.dict-search-row{display:flex; gap:10px; margin-bottom:14px;}
+.dict-search-input{flex:1; font-family:var(--font-si); font-size:16px; padding:11px 14px;}
+.dict-status{font-size:13px; color:var(--ink-soft); font-family:var(--font-ui); padding:10px 14px; background:var(--tea-50); border-radius:10px; margin-bottom:14px;}
+.dict-results{min-height:40px;}
+.dict-empty{color:var(--ink-soft); font-size:14px; font-family:var(--font-ui); padding:14px 0;}
+.dict-entry{background:var(--tea-50); border:1px solid var(--tea-100); border-radius:12px; padding:16px 18px;}
+.dict-entry-word{font-family:var(--font-si); font-size:24px; font-weight:700; color:var(--tea-600); display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+[data-theme="dark"] .dict-entry-word{color:var(--tea-400);}
+.dict-entry-dir{font-family:var(--font-ui); font-size:11px; font-weight:600; color:var(--ink-soft); background:var(--paper); border:1px solid var(--line); padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:.03em;}
+.dict-meaning-list{display:flex; flex-wrap:wrap; gap:8px;}
+.dict-meaning-chip{background:var(--paper); border:1px solid var(--line); color:var(--ink); font-family:var(--font-si); font-size:15px; padding:6px 13px; border-radius:999px;}
+
 /* ---------- guide tab ---------- */
 .scheme-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;}
 .scheme-item{background:var(--tea-50); border:1px solid var(--tea-100); border-radius:10px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; font-family:var(--font-ui); font-size:13px;}
@@ -299,7 +312,8 @@ body{
   .brand-mark svg{width:34px; height:34px;}
   .badge{display:none;}
   .wrap{padding:18px 12px 44px;}
-  .tab-btn{flex:1; text-align:center; padding:10px 6px; font-size:12px;}
+  .tabs{flex-wrap:wrap;}
+  .tab-btn{flex:1 1 calc(50% - 4px); text-align:center; padding:10px 6px; font-size:12px;}
   .card{padding:14px 12px 18px;}
   .convert-grid{grid-template-columns:1fr;}
   .editor-footer{flex-direction:column; align-items:stretch;}
@@ -310,4 +324,6 @@ body{
   .settings-drawer{width:100%; max-width:100%;}
   .compose-popup{max-width:92vw;}
   .sinhala-editor{font-size:calc(var(--editor-font-size) - 1px);}
+  .dict-search-row{flex-direction:column;}
+  .dict-entry-word{font-size:20px; flex-wrap:wrap;}
 }
