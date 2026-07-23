@@ -54,7 +54,7 @@
       <button class="icon-btn" id="settingsBtn" title="Settings">
         <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .35 1.9l.05.05a2 2 0 1 1-2.9 2.9l-.05-.05a1.7 1.7 0 0 0-1.9-.35 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.9.35l-.05.05a2 2 0 1 1-2.9-2.9l.05-.05a1.7 1.7 0 0 0 .35-1.9 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.35-1.9l-.05-.05a2 2 0 1 1 2.9-2.9l.05.05a1.7 1.7 0 0 0 1.9.35H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.9-.35l.05-.05a2 2 0 1 1 2.9 2.9l-.05.05a1.7 1.7 0 0 0-.35 1.9V10a1.7 1.7 0 0 0 1.55 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       </button>
-      <span class="badge">v5.0</span>
+      <span class="badge">v5.1</span>
     </div>
   </div>
 </header>
@@ -202,12 +202,37 @@
     <div class="card">
       <h2 class="card-title">How Singlish Typing Works</h2>
 
-      <p class="card-sub">Type using English letters — they're converted to Sinhala Unicode automatically as you type. Use the key scheme below as a reference.</p>
+      <p class="card-sub">Type using English letters — they're converted to Sinhala Unicode automatically as you type. The tables below show every key combination the engine understands, organized the same way as the official scheme reference.</p>
 
-      <div class="scheme-grid" id="schemeGrid"></div>
+      <h3 class="sub-head">ස්වර අක්ෂර (Vowels)</h3>
+      <p class="card-sub" style="margin-bottom:10px">Write phonetically. For a long vowel, double the same English letter. Only ඇ and ඍ use capital letters.</p>
+      <div class="scheme-grid" id="vowelGrid"></div>
 
-      <h3 class="sub-head">Special characters</h3>
+      <h3 class="sub-head">ව්‍යංජන අක්ෂර (Consonants)</h3>
+      <p class="card-sub" style="margin-bottom:10px">Write phonetically. Retroflex (මූර්ධජ) letters use a capital first letter. ‘ද’ can also be typed as <code>q</code>.</p>
+      <div class="scheme-grid" id="consonantGrid"></div>
+
+      <h3 class="sub-head">මහප්‍රාණ අක්ෂර (Aspirated letters)</h3>
+      <p class="card-sub" style="margin-bottom:10px">Add <code>h</code> to the base consonant. Only ‘ඨ’ and ‘ඪ’ use a capital letter.</p>
+      <div class="scheme-grid" id="aspirateGrid"></div>
+
+      <h3 class="sub-head">සඤ්ඤක සහ අනෙකුත් අක්ෂර (Prenasalized &amp; other letters)</h3>
+      <p class="card-sub" style="margin-bottom:10px">Add <code>z</code> before the base consonant. Only ‘ඹ’ uses a capital <code>B</code>.</p>
+      <div class="scheme-grid" id="sannakaGrid"></div>
+
+      <h3 class="sub-head">පිළි සමඟ උදාහරණ (Letter + vowel-sign examples, using ‘ක’)</h3>
+      <div class="scheme-grid" id="piliGrid"></div>
+
+      <h3 class="sub-head">විශේෂ අක්ෂර (Special characters)</h3>
       <div class="scheme-grid" id="specialGrid"></div>
+
+      <h3 class="sub-head">බැඳි අක්ෂර — Conjuncts (Yansaya, Rakaransha, Repaya)</h3>
+      <p class="card-sub" style="margin-bottom:10px">
+        <strong>Yansaya (◌්‍ය)</strong> forms automatically — type a consonant, then <code>y</code>, then a vowel: <code>vidya</code> → <strong>විද්‍යා</strong>.
+        <strong>Rakaransha (◌්‍ර)</strong> works the same way with <code>r</code>: <code>kra</code> → <strong>ක්‍ර</strong>.
+        <strong>Repaya (ර්‍◌)</strong> comes before the next consonant — type <code>\r</code> then the consonant.
+        If a particular conjunct won't type correctly from Singlish, open the on-screen <strong>Keyboard</strong> panel (⌨️ button above the text box) — it has dedicated ◌්‍ය, ◌්‍ර, ර්‍◌ and ZWJ keys you can tap right after a base consonant to join them by hand.
+      </p>
 
       <h3 class="sub-head">Examples</h3>
       <div class="example-grid" id="exampleGrid"></div>
@@ -306,7 +331,7 @@
 
 <footer class="site-footer">
   <p>Developed by <a href="https://lakshan.vercel.app/" target="_blank" rel="noopener"><strong>V.P.R. Lakshan Vidanapathirana</strong></a></p>
-  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v5.0</p>
+  <p class="footer-meta">© <span id="footerYear"></span> RL Sinhala Keyboard · v5.1</p>
 </footer>
 
 <div class="toast" id="toast"></div>

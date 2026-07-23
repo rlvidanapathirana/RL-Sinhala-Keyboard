@@ -1,35 +1,60 @@
-# RL Sinhala Keyboard — V5.0
+# RL Sinhala Keyboard — V5.1
 
-A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary, bilingual voice + keyboard typing, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
+A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V5.0
+## What's new in V5.1
 
-- 📘 **New Dictionary tab** — a full English ⇄ Sinhala dictionary (130,000+ entries), searchable directly in the app, with automatic language detection. Double-click any word in the Type tab to see its meaning instantly, like a built-in "Dictionary Anywhere". Built entirely from offline data — no dependency on a third-party API, so it never breaks, rate-limits, or needs a server.
-- ⌨️ **Font Converter now accepts Singlish input.** When converting Unicode → FM Abhaya/ISI, you can type directly in Singlish in the input box and it'll transliterate live, exactly like the main Type tab — no more needing to type or paste Unicode text first.
-- 🐛 **More caret-positioning correctness** — the Font Size setting could previously leave the suggestion popup's position stale after a size change; it now re-measures correctly every time.
-- ⚡ Continued performance and accuracy work across the whole suggestion and conversion pipeline.
-
-## Why not the referenced googleDictionaryAPI?
-
-That project (and its various forks) scrapes Google's own dictionary UI rather than using an official API — most public instances are unreliable, rate-limited, or offline entirely, and it only covers English definitions (not Sinhala). Since you already had a proper English ⇄ Sinhala dataset in your RL Dictionary project, building the lookup from that instead gives the same "double-click a word for its meaning" experience, but reliably, offline, and bilingually — without depending on someone else's scraper staying alive.
+- 📐 **Full official scheme support.** Every vowel, consonant, aspirated letter, and prenasalized (sannaka) letter from the complete reference scheme now works exactly as documented — including `chh`/`thh`/`dhh` for ඡ/ථ/ධ, the `z`-prefixed letters (`zg`, `zj`, `zd`, `zdh`/`zq`, `zk`, `zh`) for ඟ/ඦ/ඬ/ඳ/ඤ/ඥ, `R`/`Ru` for ඍ/ඎ, `ai`/`ou` for ඓ/ඖ, and more. All previously-working spellings still work too — this was purely additive.
+- 🐛 **Fixed a subtle matching bug** in the process: a few of the new multi-letter combinations (e.g. `chha`) were being partially swallowed by shorter, unrelated rules (`h`+`a`) before they got a chance to match, because the vowel was baked into the token instead of being handled by the normal consonant+vowel combination logic. Every new entry now goes through that same logic properly, so it can't happen again.
+- 🔤 **Full Guide tab rewrite** — vowels, consonants, aspirated letters, prenasalized letters, and letter+vowel-sign (pili) examples are now laid out in the same categorized structure as the official reference, instead of one long mixed list.
+- ⌨️ **New conjunct-building keys on the virtual keyboard** — ◌්‍ය (Yansaya), ◌්‍ර (Rakaransha), ර්‍◌ (Repaya), and a raw ZWJ key, so any conjunct that's awkward to type phonetically can be built by tapping a base consonant and then one of these.
 
 ## Features
 
-- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type (word-scoped composition, so multi-letter phonemes like `th`, `sh`, `kh`, and `y`-conjuncts like `dya`, never get corrupted mid-word).
+- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word).
 - 🎙️ **Bilingual voice + keyboard typing**: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
 - 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
 - 💡 **Word prediction**: dictionary-verified spellings first (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
 - 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable or via double-click.
 - 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, typeable in Singlish, using a 1,600+ entry mapping table with longest-match substitution.
 - 📋 **Copy as…**: copy your text as Unicode, FM Abhaya, or ISI directly.
-- ⌨️ **On-screen virtual keyboard** for direct Sinhala glyph entry.
+- ⌨️ **On-screen virtual keyboard** with dedicated conjunct-building keys for hard-to-type joined letters.
 - ⚙️ **Settings**: auto-copy to clipboard, sound effects, dark mode, real-time vs. word-boundary conversion, adjustable font size — all persisted locally.
 - 📲 **Installable app (PWA)** with offline support — "Install" on desktop/Android, "Add to Home Screen" on iPhone.
-- 📖 **Built-in scheme guide** so anyone can learn the typing convention in a minute.
+- 📖 **Built-in scheme guide**, fully categorized, so anyone can learn the typing convention in a minute.
 - 🌿 Fully responsive — desktop, Android, and iPhone Safari.
+
+## The full typing scheme
+
+| Category | Key | Result | | Category | Key | Result |
+|---|---|---|---|---|---|---|
+| Vowel | a | අ | | Consonant | k | ක |
+| Vowel | aa | ආ | | Consonant | g | ග |
+| Vowel | A | ඇ | | Consonant | ch | ච |
+| Vowel | Aa / AA | ඈ | | Consonant | j | ජ |
+| Vowel | i | ඉ | | Consonant | t | ට |
+| Vowel | ii | ඊ | | Consonant | d | ඩ |
+| Vowel | u | උ | | Consonant | th | ත |
+| Vowel | uu | ඌ | | Consonant | dh / q | ද |
+| Vowel | R | ඍ | | Consonant | n | න |
+| Vowel | Ru | ඎ | | Consonant | N | ණ |
+| Vowel | e | එ | | Consonant | p | ප |
+| Vowel | ee | ඒ | | Consonant | b | බ |
+| Vowel | ai | ඓ | | Consonant | m | ම |
+| Vowel | o | ඔ | | Consonant | y | ය |
+| Vowel | oo | ඕ | | Consonant | r | ර |
+| Vowel | au / ou | ඖ | | Consonant | l / L | ල / ළ |
+
+Aspirated: `kh`→ඛ, `gh`→ඝ, `chh`→ඡ, `T`→ඨ, `D`→ඪ, `thh`→ථ, `dhh`→ධ, `ph`→ඵ, `bh`→භ.
+Prenasalized: `zg`→ඟ, `zj`→ඦ, `zd`→ඬ, `zdh`/`zq`→ඳ, `zk`→ඤ, `zh`→ඥ, `B`→ඹ, `Lu`→ළු.
+Full detail, plus letter+vowel-sign (pili) examples and conjuncts, are in the app's own Guide tab.
+
+## Why not the referenced googleDictionaryAPI?
+
+That project (and its various forks) scrapes Google's own dictionary UI rather than using an official API — most public instances are unreliable, rate-limited, or offline entirely, and it only covers English definitions (not Sinhala). Since you already had a proper English ⇄ Sinhala dataset in your RL Dictionary project, building the lookup from that instead gives the same "double-click a word for its meaning" experience, but reliably, offline, and bilingually — without depending on someone else's scraper staying alive.
 
 ## Files
 

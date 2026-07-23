@@ -199,6 +199,8 @@ body{
 .vk-key:hover{background:var(--tea-500); transform:translateY(-2px);}
 .vk-key:active{transform:translateY(0);}
 .vk-key.space{grid-column:1/-1; font-family:var(--font-ui); font-size:12px; letter-spacing:.05em;}
+.vk-key.vk-conjunct{background:#3a2f10; color:var(--gold-light); font-size:14px; font-family:var(--font-ui); font-weight:600;}
+.vk-key.vk-conjunct:hover{background:var(--gold); color:#1a1400;}
 
 /* ---------- editor footer ---------- */
 .editor-footer{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:18px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap;}

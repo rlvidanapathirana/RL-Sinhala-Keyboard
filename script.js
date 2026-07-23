@@ -9,7 +9,15 @@
    * 1. TRANSLITERATION ENGINE (Singlish -> Sinhala Unicode)
    * -------------------------------------------------------------------- */
   const CONSONANTS = [
-    ["nnd", "ඬ"], ["nndh", "ඳ"], ["nng", "ඟ"], ["Th", "ථ"], ["Dh", "ධ"],
+    // Longer / more specific patterns must stay ahead of any shorter prefix they contain.
+    // Note: multi-letter tokens here are the BARE consonant (no vowel baked in) so they
+    // combine correctly with vowel suffixes via the same mechanism as every other entry —
+    // e.g. "chh" + "a" -> ඡ, not a fixed literal "chha" string (which would let a shorter
+    // rule like "h"+"a" wrongly match inside it before the longer form ever got a chance).
+    ["nnd", "ඬ"], ["nndh", "ඳ"], ["nng", "ඟ"],
+    ["zdh", "ඳ"], ["zq", "ඳ"], ["zd", "ඬ"], ["zg", "ඟ"], ["zj", "ඦ"], ["zk", "ඤ"], ["zh", "ඥ"],
+    ["chh", "ඡ"], ["thh", "ථ"], ["dhh", "ධ"],
+    ["Th", "ථ"], ["Dh", "ධ"],
     ["gh", "ඝ"], ["Ch", "ඡ"], ["ph", "ඵ"], ["bh", "භ"], ["sh", "ශ"],
     ["Sh", "ෂ"], ["GN", "ඥ"], ["KN", "ඤ"], ["Lu", "ළු"], ["dh", "ද"],
     ["ch", "ච"], ["kh", "ඛ"], ["th", "ත"],
@@ -17,23 +25,26 @@
     ["m", "ම"], ["\\\\y", "\u200Dය"], ["Y", "\u200Dය"], ["y", "ය"], ["j", "ජ"],
     ["l", "ල"], ["v", "ව"], ["w", "ව"], ["s", "ස"], ["h", "හ"], ["N", "ණ"],
     ["L", "ළ"], ["K", "ඛ"], ["G", "ඝ"], ["T", "ඨ"], ["D", "ඪ"], ["P", "ඵ"],
-    ["B", "ඹ"], ["f", "ෆ"], ["q", "ඣ"], ["g", "ග"],
+    ["B", "ඹ"], ["f", "ෆ"], ["q", "ද"], ["g", "ග"], ["S", "ෂ"], ["X", "ඞ"],
     ["r", "ර"]
   ];
   const VOWELS = [
-    ["oo", "ඌ", "ූ"], ["o\\)", "ඕ", "ෝ"], ["oe", "ඕ", "ෝ"], ["aa", "ආ", "ා"],
-    ["a\\)", "ආ", "ා"], ["Aa", "ඈ", "ෑ"], ["A\\)", "ඈ", "ෑ"], ["ae", "ඈ", "ෑ"],
-    ["ii", "ඊ", "ී"], ["i\\)", "ඊ", "ී"], ["ie", "ඊ", "ී"], ["ee", "ඊ", "ී"],
+    // Multi-letter vowels must be listed ahead of any single-letter vowel they start with.
+    ["oo", "ඕ", "ෝ"], ["o\\)", "ඕ", "ෝ"], ["oe", "ඕ", "ෝ"], ["aa", "ආ", "ා"],
+    ["a\\)", "ආ", "ා"], ["AA", "ඈ", "ෑ"], ["Aa", "ඈ", "ෑ"], ["A\\)", "ඈ", "ෑ"], ["ae", "ඈ", "ෑ"],
+    ["ii", "ඊ", "ී"], ["i\\)", "ඊ", "ී"], ["ie", "ඊ", "ී"], ["ee", "ඒ", "ේ"],
     ["ea", "ඒ", "ේ"], ["e\\)", "ඒ", "ේ"], ["ei", "ඒ", "ේ"], ["uu", "ඌ", "ූ"],
-    ["u\\)", "ඌ", "ූ"], ["au", "ඖ", "ෞ"], ["/\\\\a", "ඇ", "ැ"],
+    ["u\\)", "ඌ", "ූ"], ["au", "ඖ", "ෞ"], ["ou", "ඖ", "ෞ"], ["ai", "ඓ", "ෛ"], ["Ru", "ඎ", "ෲ"],
+    ["/\\\\a", "ඇ", "ැ"],
     ["a", "අ", ""], ["A", "ඇ", "ැ"], ["i", "ඉ", "ි"], ["e", "එ", "ෙ"],
-    ["u", "උ", "ු"], ["o", "ඔ", "ො"], ["I", "ඓ", "ෛ"]
+    ["u", "උ", "ු"], ["o", "ඔ", "ො"], ["I", "ඓ", "ෛ"], ["R", "ඍ", "ෘ"]
   ];
   const SPECIAL_CONSONANTS = [
     [/\\n/g, "ං"], [/\\h/g, "ඃ"], [/\\N/g, "ඞ"], [/\\R/g, "ඍ"],
-    [/R/g, "ර්\u200D"], [/\\r/g, "ර්\u200D"]
+    [/\\r/g, "ර්\u200D"], [/zn/g, "ං"], [/H/g, "ඃ"]
   ];
   const SPECIAL_CHAR = [["ruu", "ෲ"], ["ru", "ෘ"]];
+
 
   // All regexes are compiled once here instead of on every keystroke — this is what
   // keeps live typing fast even as the transliteration rule set has grown.
@@ -686,6 +697,14 @@
   const VK_CONSONANTS = ["ක", "ඛ", "ග", "ඝ", "ඞ", "ච", "ඡ", "ජ", "ඣ", "ඤ", "ට", "ඨ", "ඩ", "ඪ", "ණ",
     "ත", "ථ", "ද", "ධ", "න", "ප", "ඵ", "බ", "භ", "ම", "ය", "ර", "ල", "ව", "ශ", "ෂ", "ස", "හ", "ළ", "ෆ"];
   const VK_MODIFIERS = ["ං", "ඃ", "්", "ා", "ැ", "ෑ", "ි", "ී", "ු", "ූ", "ෙ", "ේ", "ෛ", "ො", "ෝ", "ෞ"];
+  // Conjunct helpers: click a base consonant first, then one of these to join it into a
+  // yansaya/rakaransha/repaya conjunct — useful when the Singlish shortcut is hard to recall.
+  const VK_CONJUNCTS = [
+    { label: "◌්‍ය", title: "Yansaya — join as ්‍ය (e.g. ක් + this → ක්‍ය)", insert: "්\u200Dය" },
+    { label: "◌්‍ර", title: "Rakaransha — join as ්‍ර (e.g. ක් + this → ක්‍ර)", insert: "්\u200Dර" },
+    { label: "ර්‍◌", title: "Repaya — insert before the next consonant", insert: "ර්\u200D" },
+    { label: "ZWJ", title: "Zero-width joiner — for building other conjuncts manually", insert: "\u200D" }
+  ];
 
   function buildVirtualKeyboard() {
     virtualKeyboard.innerHTML = "";
@@ -696,6 +715,12 @@
       virtualKeyboard.appendChild(key);
     });
     addRow(VK_VOWELS); addRow(VK_CONSONANTS); addRow(VK_MODIFIERS);
+    VK_CONJUNCTS.forEach(({ label, title, insert }) => {
+      const key = document.createElement("button");
+      key.type = "button"; key.className = "vk-key vk-conjunct"; key.textContent = label; key.title = title;
+      key.addEventListener("mousedown", (e) => { e.preventDefault(); sfx.key(); insertAtCursor(insert); });
+      virtualKeyboard.appendChild(key);
+    });
     const spaceKey = document.createElement("button");
     spaceKey.type = "button"; spaceKey.className = "vk-key space"; spaceKey.textContent = "SPACE";
     spaceKey.addEventListener("mousedown", (e) => { e.preventDefault(); insertAtCursor(" "); });
@@ -940,23 +965,36 @@
   /* ----------------------------------------------------------------------
    * 13. GUIDE TAB
    * -------------------------------------------------------------------- */
-  const SCHEME_ITEMS = [
-    ["a", "අ"], ["aa", "ආ"], ["A / ae", "ඇ"], ["Aa", "ඈ"], ["i", "ඉ"], ["ii / ee", "ඊ"],
-    ["u", "උ"], ["uu / oo", "ඌ"], ["e", "එ"], ["ea", "ඒ"], ["I", "ඓ"], ["o", "ඔ"],
-    ["oe", "ඕ"], ["au", "ඖ"],
-    ["k", "ක"], ["kh / K", "ඛ"], ["g", "ග"], ["gh / G", "ඝ"], ["ch", "ච"], ["Ch", "ඡ"],
-    ["j", "ජ"], ["q", "ඣ"], ["KN", "ඤ"], ["t", "ට"], ["T", "ඨ"], ["d", "ඩ"], ["D", "ඪ"],
-    ["N", "ණ"], ["th", "ත"], ["Th", "ථ"], ["dh", "ද"], ["Dh", "ධ"], ["n", "න"],
-    ["p", "ප"], ["ph / P", "ඵ"], ["b", "බ"], ["B", "ඹ"], ["bh", "භ"], ["m", "ම"],
-    ["y", "ය"], ["r", "ර"], ["l", "ල"], ["v / w", "ව"], ["sh", "ශ"], ["Sh", "ෂ"],
-    ["s", "ස"], ["h", "හ"], ["L", "ළ"], ["f", "ෆ"]
+  const VOWEL_ITEMS = [
+    ["a", "අ"], ["aa", "ආ"], ["A", "ඇ"], ["Aa / AA", "ඈ"], ["i", "ඉ"], ["ii", "ඊ"],
+    ["u", "උ"], ["uu", "ඌ"], ["R", "ඍ"], ["Ru", "ඎ"], ["e", "එ"], ["ee", "ඒ"],
+    ["ai", "ඓ"], ["o", "ඔ"], ["oo", "ඕ"], ["au / ou", "ඖ"]
+  ];
+  const CONSONANT_ITEMS = [
+    ["k", "ක"], ["g", "ග"], ["ch", "ච"], ["j", "ජ"], ["t", "ට"], ["d", "ඩ"],
+    ["th", "ත"], ["dh / q", "ද"], ["n", "න"], ["N", "ණ"], ["p", "ප"], ["b", "බ"],
+    ["m", "ම"], ["y", "ය"], ["r", "ර"], ["l", "ල"], ["L", "ළ"], ["w / v", "ව"],
+    ["s", "ස"], ["sh", "ශ"], ["S / Sh", "ෂ"], ["h", "හ"], ["f", "ෆ"], ["X", "ඞ"]
+  ];
+  const ASPIRATE_ITEMS = [
+    ["kh", "ඛ"], ["gh", "ඝ"], ["chh", "ඡ"], ["T", "ඨ"], ["D", "ඪ"],
+    ["thh", "ථ"], ["dhh", "ධ"], ["ph", "ඵ"], ["bh", "භ"]
+  ];
+  const SANNAKA_ITEMS = [
+    ["zg", "ඟ"], ["zj", "ඦ"], ["zd", "ඬ"], ["zdh / zq", "ඳ"],
+    ["zk", "ඤ"], ["zh", "ඥ"], ["B", "ඹ"], ["Lu", "ළු"]
+  ];
+  const PILI_ITEMS = [
+    ["k", "ක්"], ["ka", "ක"], ["kaa", "කා"], ["kA", "කැ"], ["kAa", "කෑ"], ["ki", "කි"],
+    ["kii", "කී"], ["ku", "කු"], ["kuu", "කූ"], ["kru", "කෘ"], ["kruu", "කෲ"], ["ke", "කෙ"],
+    ["kee", "කේ"], ["kai", "කෛ"], ["ko", "කො"], ["koo", "කෝ"], ["kau", "කෞ"],
+    ["kya", "ක්‍ය"], ["kra", "ක්‍ර"]
   ];
   const SPECIAL_ITEMS = [
-    ["\\n", "ං (Anusvara)"], ["\\h", "ඃ (Visarga)"], ["\\N", "ඞ"], ["\\R", "ඍ"],
-    ["R / \\r", "ර්‍ (Repaya)"],
+    ["\\n / zn", "ං (Anusvara)"], ["\\h / H", "ඃ (Visarga)"], ["\\N", "ඞ"],
+    ["\\r", "ර්‍ (Repaya, before next consonant)"],
     ["Xr + vowel", "X්‍ර… (Rakaransha) — e.g. kra → ක්‍ර"],
-    ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. vidya → විද්‍යා"],
-    ["Xru", "Xෘ — e.g. kru → කෘ"], ["Xruu", "Xෲ — e.g. kruu → කෲ"]
+    ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. vidya → විද්‍යා"]
   ];
   const EXAMPLE_ITEMS = [
     ["mama gedara yanawa", "මම ගෙදර යනවා"],
@@ -967,8 +1005,15 @@
     ["vidyava", "විද්‍යාව"]
   ];
   function buildGuideTables() {
-    document.getElementById("schemeGrid").innerHTML = SCHEME_ITEMS.map(([k, v]) =>
-      `<div class="scheme-item"><code>${k}</code><span class="glyph">${v}</span></div>`).join("");
+    const render = (id, items) => {
+      document.getElementById(id).innerHTML = items.map(([k, v]) =>
+        `<div class="scheme-item"><code>${k}</code><span class="glyph">${v}</span></div>`).join("");
+    };
+    render("vowelGrid", VOWEL_ITEMS);
+    render("consonantGrid", CONSONANT_ITEMS);
+    render("aspirateGrid", ASPIRATE_ITEMS);
+    render("sannakaGrid", SANNAKA_ITEMS);
+    render("piliGrid", PILI_ITEMS);
     document.getElementById("specialGrid").innerHTML = SPECIAL_ITEMS.map(([k, v]) =>
       `<div class="scheme-item"><code>${k}</code><span class="glyph" style="font-size:14px">${v}</span></div>`).join("");
     document.getElementById("exampleGrid").innerHTML = EXAMPLE_ITEMS.map(([inp, out]) =>
