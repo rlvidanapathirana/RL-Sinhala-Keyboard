@@ -1,21 +1,25 @@
-# RL Sinhala Keyboard — V5.1
+# RL Sinhala Keyboard — V6.0
 
-A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
+A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V5.1
+## What's new in V6.0
 
-- 📐 **Full official scheme support.** Every vowel, consonant, aspirated letter, and prenasalized (sannaka) letter from the complete reference scheme now works exactly as documented — including `chh`/`thh`/`dhh` for ඡ/ථ/ධ, the `z`-prefixed letters (`zg`, `zj`, `zd`, `zdh`/`zq`, `zk`, `zh`) for ඟ/ඦ/ඬ/ඳ/ඤ/ඥ, `R`/`Ru` for ඍ/ඎ, `ai`/`ou` for ඓ/ඖ, and more. All previously-working spellings still work too — this was purely additive.
-- 🐛 **Fixed a subtle matching bug** in the process: a few of the new multi-letter combinations (e.g. `chha`) were being partially swallowed by shorter, unrelated rules (`h`+`a`) before they got a chance to match, because the vowel was baked into the token instead of being handled by the normal consonant+vowel combination logic. Every new entry now goes through that same logic properly, so it can't happen again.
-- 🔤 **Full Guide tab rewrite** — vowels, consonants, aspirated letters, prenasalized letters, and letter+vowel-sign (pili) examples are now laid out in the same categorized structure as the official reference, instead of one long mixed list.
-- ⌨️ **New conjunct-building keys on the virtual keyboard** — ◌්‍ය (Yansaya), ◌්‍ර (Rakaransha), ර්‍◌ (Repaya), and a raw ZWJ key, so any conjunct that's awkward to type phonetically can be built by tapping a base consonant and then one of these.
+- 🐛 **Fixed `x` → ං (anusvara).** This rule existed in an earlier version but got dropped by accident during a later edit — it's back and tested.
+- 🐛 **Fixed bare `Y` (yansaya joiner) getting an extra, incorrect halant.** `kY` now correctly ends in ක්‍ය, not ක්‍ය්‍. Capital `Y` and lowercase `\y` both work reliably now, in addition to the automatic lowercase-`y` conjunct detection.
+- 🎙️ **Faster-feeling voice typing.** Speech recognition already streams interim (in-progress) results — this version now actually shows them live while you're speaking, instead of only showing text once a full phrase is finalized. It's the same underlying free browser technology, used more fully, so voice typing feels much more immediate without depending on any paid or third-party speech service.
+- 🎨 **Premium UI refresh** — cards now use a soft glass effect (backdrop blur) so the animated green background subtly shows through, buttons and the active tab now use richer gradients with a gentle lift on hover, and shadows are tinted green instead of flat black for a more cohesive premium look.
+
+## A note on voice typing speed
+
+There isn't a faster *free* alternative to the browser's built-in Web Speech API without depending on a paid cloud service (Google Cloud Speech-to-Text, Azure, etc.) or shipping a large offline model (e.g. Whisper) that would make this a very different, much heavier kind of app. The real lever available for a lightweight, free, static site is using the API's own interim results properly — which V6.0 now does — so you see your words appear as you speak them rather than waiting for a pause.
 
 ## Features
 
 - ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word).
-- 🎙️ **Bilingual voice + keyboard typing**: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
+- 🎙️ **Bilingual voice + keyboard typing** with live interim preview: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
 - 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
 - 💡 **Word prediction**: dictionary-verified spellings first (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
 - 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable or via double-click.

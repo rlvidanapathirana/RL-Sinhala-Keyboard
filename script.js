@@ -41,7 +41,7 @@
   ];
   const SPECIAL_CONSONANTS = [
     [/\\n/g, "ං"], [/\\h/g, "ඃ"], [/\\N/g, "ඞ"], [/\\R/g, "ඍ"],
-    [/\\r/g, "ර්\u200D"], [/zn/g, "ං"], [/H/g, "ඃ"]
+    [/\\r/g, "ර්\u200D"], [/zn/g, "ං"], [/x/g, "ං"], [/H/g, "ඃ"]
   ];
   const SPECIAL_CHAR = [["ruu", "ෲ"], ["ru", "ෘ"]];
 
@@ -71,7 +71,14 @@
     for (const [c, cu] of CONSONANTS) {
       for (const [v, , vm] of VOWELS) rules.consonantVowel.push([new RegExp(c + v, "g"), cu + vm]);
     }
-    for (const [c, cu] of CONSONANTS) rules.consonantBare.push([new RegExp(c, "g"), cu + "්"]);
+    // Y and \y are themselves already a complete "hal + ZWJ + ya" joiner (used to force a
+    // yansaya conjunct explicitly), so — unlike a real consonant — they must NOT get an
+    // extra halant appended when bare (e.g. at the end of a word): "kY" should end in ක්‍ය,
+    // not ක්‍ය්.
+    const YANSAYA_JOINERS = new Set(["Y", "\\\\y"]);
+    for (const [c, cu] of CONSONANTS) {
+      rules.consonantBare.push([new RegExp(c, "g"), YANSAYA_JOINERS.has(c) ? cu : cu + "්"]);
+    }
     for (const [v, vu] of VOWELS) rules.vowel.push([new RegExp(v, "g"), vu]);
     return rules;
   }
@@ -579,6 +586,7 @@
   const micBtn = document.getElementById("micBtn");
   const micStatus = document.getElementById("micStatus");
   const micStatusText = document.getElementById("micStatusText");
+  const micInterim = document.getElementById("micInterim");
   const micUnsupported = document.getElementById("micUnsupported");
   const micLangToggle = document.getElementById("micLangToggle");
   const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -593,6 +601,7 @@
     isRecording = false;
     micBtn.classList.remove("recording");
     micStatus.hidden = true;
+    micInterim.textContent = "";
   }
 
   function updateMicLangUI() {
@@ -646,16 +655,21 @@
       }
     };
     recognition.onresult = (event) => {
-      let finalText = "";
+      let finalText = "", interimText = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) finalText += event.results[i][0].transcript;
+        else interimText += event.results[i][0].transcript;
       }
+      // Show the in-progress phrase immediately, before it's finalized — this is what
+      // makes voice typing feel fast: you see words as you say them, not after a pause.
+      micInterim.textContent = interimText ? "“" + interimText + "”" : "";
       if (finalText) {
         // Text is inserted exactly as recognized (Sinhala script or English Latin script,
         // depending on the active voice language) — never run through transliteration.
         // Each recognized segment (i.e. the phrase said before a natural pause) gets a
         // trailing full stop automatically, unless it already ends with punctuation.
         if (pending) resetPending();
+        micInterim.textContent = "";
         const trimmed = finalText.trim();
         const withStop = SENTENCE_END.test(trimmed) ? trimmed : trimmed + ".";
         const pos = editor.selectionStart;
