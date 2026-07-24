@@ -23,7 +23,7 @@
     ["ch", "ච"], ["kh", "ඛ"], ["th", "ත"],
     ["t", "ට"], ["k", "ක"], ["d", "ඩ"], ["n", "න"], ["p", "ප"], ["b", "බ"],
     ["m", "ම"], ["\\\\y", "\u200Dය"], ["Y", "\u200Dය"], ["y", "ය"], ["j", "ජ"],
-    ["l", "ල"], ["v", "ව"], ["w", "ව"], ["s", "ස"], ["h", "හ"], ["N", "ණ"],
+    ["l", "ල"], ["v", "ව"], ["V", "ව"], ["w", "ව"], ["W", "ව"], ["s", "ස"], ["h", "හ"], ["N", "ණ"],
     ["L", "ළ"], ["K", "ඛ"], ["G", "ඝ"], ["T", "ඨ"], ["D", "ඪ"], ["P", "ඵ"],
     ["B", "ඹ"], ["f", "ෆ"], ["q", "ද"], ["g", "ග"], ["S", "ෂ"], ["X", "ඞ"],
     ["r", "ර"]
@@ -396,7 +396,10 @@
 
     // 1. Real dictionary-verified spelling(s) for exactly what's typed so far (best quality —
     //    this is what fixes cases like "gedara" wrongly guessing ගෙඩර instead of ගෙදර).
-    if (key && state.fuzzy.has(key)) candidates.push(...state.fuzzy.get(key));
+    //    Short keys (< 4 letters) are skipped here: they're often ambiguous fragments in the
+    //    source data rather than a real intended whole word (e.g. "kra" as a dictionary key
+    //    can map to a lower-quality entry than the engine's own, well-defined ක්‍ර).
+    if (key && key.length >= 4 && state.fuzzy.has(key)) candidates.push(...state.fuzzy.get(key));
 
     // 2. The live transliteration engine's own conversion (keeps popup consistent with the bubble)
     if (previewText && !candidates.includes(previewText)) candidates.push(previewText);
@@ -987,7 +990,7 @@
   const CONSONANT_ITEMS = [
     ["k", "ක"], ["g", "ග"], ["ch", "ච"], ["j", "ජ"], ["t", "ට"], ["d", "ඩ"],
     ["th", "ත"], ["dh / q", "ද"], ["n", "න"], ["N", "ණ"], ["p", "ප"], ["b", "බ"],
-    ["m", "ම"], ["y", "ය"], ["r", "ර"], ["l", "ල"], ["L", "ළ"], ["w / v", "ව"],
+    ["m", "ම"], ["y", "ය"], ["r", "ර"], ["l", "ල"], ["L", "ළ"], ["w / v / V", "ව"],
     ["s", "ස"], ["sh", "ශ"], ["S / Sh", "ෂ"], ["h", "හ"], ["f", "ෆ"], ["X", "ඞ"]
   ];
   const ASPIRATE_ITEMS = [
@@ -1005,10 +1008,11 @@
     ["kya", "ක්‍ය"], ["kra", "ක්‍ර"]
   ];
   const SPECIAL_ITEMS = [
-    ["\\n / zn", "ං (Anusvara)"], ["\\h / H", "ඃ (Visarga)"], ["\\N", "ඞ"],
+    ["\\n / x / zn", "ං (Anusvara)"], ["\\h / H", "ඃ (Visarga)"], ["\\N", "ඞ"],
     ["\\r", "ර්‍ (Repaya, before next consonant)"],
     ["Xr + vowel", "X්‍ර… (Rakaransha) — e.g. kra → ක්‍ර"],
-    ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. vidya → විද්‍යා"]
+    ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. kya → ක්‍ය"],
+    ["XY (capital Y)", "X්‍ය (Yansaya, explicit) — e.g. vidhYaa → විද්‍යා"]
   ];
   const EXAMPLE_ITEMS = [
     ["mama gedara yanawa", "මම ගෙදර යනවා"],
@@ -1016,7 +1020,7 @@
     ["subha aluth avurudhak", "සුභ අලුත් අවුරුද්දක්"],
     ["sri lanka", "ශ්‍රී ලංකා"],
     ["kohomadha", "කොහොමද"],
-    ["vidyava", "විද්‍යාව"]
+    ["vidhYaawa", "විද්‍යාව"]
   ];
   function buildGuideTables() {
     const render = (id, items) => {
