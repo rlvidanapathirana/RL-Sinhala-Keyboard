@@ -1,27 +1,21 @@
-# RL Sinhala Keyboard — V6.0
+# RL Sinhala Keyboard — V6.2 (Stable)
 
 A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V6.0
+## What's new in V6.2
 
-- 🐛 **Fixed `x` → ං (anusvara).** This rule existed in an earlier version but got dropped by accident during a later edit — it's back and tested.
-- 🐛 **Fixed bare `Y` (yansaya joiner) getting an extra, incorrect halant.** `kY` now correctly ends in ක්‍ය, not ක්‍ය්‍. Capital `Y` and lowercase `\y` both work reliably now, in addition to the automatic lowercase-`y` conjunct detection.
-- 🎙️ **Faster-feeling voice typing.** Speech recognition already streams interim (in-progress) results — this version now actually shows them live while you're speaking, instead of only showing text once a full phrase is finalized. It's the same underlying free browser technology, used more fully, so voice typing feels much more immediate without depending on any paid or third-party speech service.
-- 🎨 **Premium UI refresh** — cards now use a soft glass effect (backdrop blur) so the animated green background subtly shows through, buttons and the active tab now use richer gradients with a gentle lift on hover, and shadows are tinted green instead of flat black for a more cohesive premium look.
-
-## A note on voice typing speed
-
-There isn't a faster *free* alternative to the browser's built-in Web Speech API without depending on a paid cloud service (Google Cloud Speech-to-Text, Azure, etc.) or shipping a large offline model (e.g. Whisper) that would make this a very different, much heavier kind of app. The real lever available for a lightweight, free, static site is using the API's own interim results properly — which V6.0 now does — so you see your words appear as you speak them rather than waiting for a pause.
+- 📚 **Words like අධ්‍යක්ෂ (director) are now easy to get right.** Typing `adyaksha` now surfaces the correctly-joined **අධ්‍යක්ෂ** as the top suggestion — previously the literal phonetic scheme required an exact spelling like `adhhyakSha` (aspirated `dhh`, retroflex capital `S`) to get it right, which isn't how most people would naturally type it.
+- 🛡️ **Added a safeguard against a regression this surfaced.** An earlier attempt at this fix made the *default* live preview always prefer a dictionary match — but short, ambiguous keys (2–3 letters, e.g. `ka`, `kra`, `kya`) sometimes map to lower-quality or unrelated dictionary entries (one had `kra` losing its ZWJ joiner entirely). The fix now only trusts an exact dictionary match for words 4+ letters long, and only within the opt-in suggestion popup — the main typing engine itself stays fully deterministic and unchanged.
 
 ## Features
 
 - ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word).
 - 🎙️ **Bilingual voice + keyboard typing** with live interim preview: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
 - 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
-- 💡 **Word prediction**: dictionary-verified spellings first (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
+- 💡 **Word prediction**: dictionary-verified spellings first for words 4+ letters (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
 - 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable or via double-click.
 - 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, typeable in Singlish, using a 1,600+ entry mapping table with longest-match substitution.
 - 📋 **Copy as…**: copy your text as Unicode, FM Abhaya, or ISI directly.
