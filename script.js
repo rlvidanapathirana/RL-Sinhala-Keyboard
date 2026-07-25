@@ -393,13 +393,21 @@
 
     let candidates = [];
     const key = (rawWord || "").toLowerCase();
+    // The dictionary's own Singlish keys inconsistently cover "dh"/"d" and "th"/"t" spelling
+    // variants for the same word (e.g. it has "vidya" but not "vidhya", even though "vidhya"
+    // is the more phonetically correct spelling per our own scheme). Trying this normalized
+    // alternate form as a fallback closes that gap without changing the engine's own rules.
+    const altKey = key.replace(/dh/g, "d").replace(/th/g, "t");
 
     // 1. Real dictionary-verified spelling(s) for exactly what's typed so far (best quality —
     //    this is what fixes cases like "gedara" wrongly guessing ගෙඩර instead of ගෙදර).
     //    Short keys (< 4 letters) are skipped here: they're often ambiguous fragments in the
     //    source data rather than a real intended whole word (e.g. "kra" as a dictionary key
     //    can map to a lower-quality entry than the engine's own, well-defined ක්‍ර).
-    if (key && key.length >= 4 && state.fuzzy.has(key)) candidates.push(...state.fuzzy.get(key));
+    if (key && key.length >= 4) {
+      if (state.fuzzy.has(key)) candidates.push(...state.fuzzy.get(key));
+      if (altKey !== key && altKey.length >= 4 && state.fuzzy.has(altKey)) candidates.push(...state.fuzzy.get(altKey));
+    }
 
     // 2. The live transliteration engine's own conversion (keeps popup consistent with the bubble)
     if (previewText && !candidates.includes(previewText)) candidates.push(previewText);
@@ -407,13 +415,17 @@
     // 3. Prefix completion: find longer real dictionary words that START with what you've
     //    typed so far, e.g. typing "patam" finds "patamalava" -> පාඨමාලාව. This is what lets
     //    a short prefix predict a full, common word instead of just literally converting
-    //    the letters typed up to that point.
+    //    the letters typed up to that point. Tries both the raw and normalized prefix.
     if (key && key.length >= 3 && state.fuzzyKeysSorted.length) {
-      const prefixKeys = prefixSearchSorted(state.fuzzyKeysSorted, key, 12);
-      for (const pk of prefixKeys) {
-        if (pk === key) continue;
-        const vals = state.fuzzy.get(pk);
-        if (vals && vals[0] && !candidates.includes(vals[0])) candidates.push(vals[0]);
+      const prefixesToTry = altKey !== key ? [key, altKey] : [key];
+      for (const pfx of prefixesToTry) {
+        const prefixKeys = prefixSearchSorted(state.fuzzyKeysSorted, pfx, 12);
+        for (const pk of prefixKeys) {
+          if (pk === key) continue;
+          const vals = state.fuzzy.get(pk);
+          if (vals && vals[0] && !candidates.includes(vals[0])) candidates.push(vals[0]);
+          if (candidates.length >= 8) break;
+        }
         if (candidates.length >= 8) break;
       }
     }

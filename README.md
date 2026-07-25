@@ -1,21 +1,20 @@
-# RL Sinhala Keyboard — V6.2 (Stable)
+# RL Sinhala Keyboard — V6.3 (Stable)
 
 A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V6.2
+## What's new in V6.3
 
-- 📚 **Words like අධ්‍යක්ෂ (director) are now easy to get right.** Typing `adyaksha` now surfaces the correctly-joined **අධ්‍යක්ෂ** as the top suggestion — previously the literal phonetic scheme required an exact spelling like `adhhyakSha` (aspirated `dhh`, retroflex capital `S`) to get it right, which isn't how most people would naturally type it.
-- 🛡️ **Added a safeguard against a regression this surfaced.** An earlier attempt at this fix made the *default* live preview always prefer a dictionary match — but short, ambiguous keys (2–3 letters, e.g. `ka`, `kra`, `kya`) sometimes map to lower-quality or unrelated dictionary entries (one had `kra` losing its ZWJ joiner entirely). The fix now only trusts an exact dictionary match for words 4+ letters long, and only within the opt-in suggestion popup — the main typing engine itself stays fully deterministic and unchanged.
+- 📚 **Fixed `vidhya` not suggesting විද්‍යා.** The dictionary itself turned out to inconsistently cover `dh`/`d` and `th`/`t` spelling variants of the same word — it had an entry for `vidya` but not `vidhya`, even though `vidhya` is the more phonetically correct spelling under our own scheme. Suggestions (both exact match and prefix-completion) now also try a normalized fallback key, so whichever spelling variant the dictionary happens to have, you'll still find it.
 
 ## Features
 
 - ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word).
 - 🎙️ **Bilingual voice + keyboard typing** with live interim preview: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
 - 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
-- 💡 **Word prediction**: dictionary-verified spellings first for words 4+ letters (145,000 entries), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
+- 💡 **Word prediction**: dictionary-verified spellings first for words 4+ letters (145,000 entries, with dh/d and th/t variant fallback), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
 - 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable or via double-click.
 - 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, typeable in Singlish, using a 1,600+ entry mapping table with longest-match substitution.
 - 📋 **Copy as…**: copy your text as Unicode, FM Abhaya, or ISI directly.
