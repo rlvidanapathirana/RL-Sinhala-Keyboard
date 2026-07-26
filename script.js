@@ -68,6 +68,16 @@
       for (const [v, , vm] of VOWELS) rules.yansaya.push([new RegExp(c + "y" + v, "g"), cu + "්\u200Dය" + vm]);
       rules.yansayaBare.push([new RegExp(c + "y", "g"), cu + "්\u200Dය"]);
     }
+    // Explicit Y / \y joiner, with the inherent "a" some people naturally type before it
+    // absorbed — e.g. "dhaYaawa" behaves the same as "dhYaawa" (both -> ද්‍යාව), instead of
+    // the "a" being claimed by the plain consonant+vowel rule first and leaving Y stranded
+    // with no halant to attach to.
+    for (const [c, cu] of CONSONANTS) {
+      for (const [v, , vm] of VOWELS) {
+        rules.yansaya.push([new RegExp(c + "a(?:Y|\\\\\\\\y)" + v, "g"), cu + "්\u200Dය" + vm]);
+      }
+      rules.yansayaBare.push([new RegExp(c + "a(?:Y|\\\\\\\\y)", "g"), cu + "්\u200Dය"]);
+    }
     for (const [c, cu] of CONSONANTS) {
       for (const [v, , vm] of VOWELS) rules.consonantVowel.push([new RegExp(c + v, "g"), cu + vm]);
     }

@@ -1,13 +1,13 @@
-# RL Sinhala Keyboard — V6.3 (Stable)
+# RL Sinhala Keyboard — V6.4 (Stable)
 
 A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V6.3
+## What's new in V6.4
 
-- 📚 **Fixed `vidhya` not suggesting විද්‍යා.** The dictionary itself turned out to inconsistently cover `dh`/`d` and `th`/`t` spelling variants of the same word — it had an entry for `vidya` but not `vidhya`, even though `vidhya` is the more phonetically correct spelling under our own scheme. Suggestions (both exact match and prefix-completion) now also try a normalized fallback key, so whichever spelling variant the dictionary happens to have, you'll still find it.
+- 🐛 **Fixed `vidhaYaawa` (and any `consonant + a + Y` pattern) not producing a proper conjunct.** Typing an "a" between a consonant and the explicit yansaya joiner `Y` — a very natural thing to type — was letting the plain consonant+vowel rule claim the "a" first, leaving `Y` stranded with no halant to attach to (so ද + ය instead of ද්‍ය). The engine now recognizes `consonant + a + Y` as equivalent to `consonant + Y` directly, so both `vidhYaawa` and `vidhaYaawa` correctly produce විද්‍යාව. Also works with the backslash form (`dha\y`).
 
 ## Features
 
