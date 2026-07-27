@@ -1,5 +1,5 @@
-/* RL Sinhala Keyboard — Service Worker (V6.4) */
-const CACHE_NAME = "rl-sinhala-keyboard-v6-4";
+/* RL Sinhala Keyboard — Service Worker (V6.5) */
+const CACHE_NAME = "rl-sinhala-keyboard-v6-5";
 const CORE_ASSETS = [
   "./",
   "./index.html",

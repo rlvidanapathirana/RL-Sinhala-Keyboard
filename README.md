@@ -1,13 +1,14 @@
-# RL Sinhala Keyboard — V6.4 (Stable)
+# RL Sinhala Keyboard — V6.5 (Stable)
 
 A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V6.4
+## What's new in V6.5
 
-- 🐛 **Fixed `vidhaYaawa` (and any `consonant + a + Y` pattern) not producing a proper conjunct.** Typing an "a" between a consonant and the explicit yansaya joiner `Y` — a very natural thing to type — was letting the plain consonant+vowel rule claim the "a" first, leaving `Y` stranded with no halant to attach to (so ද + ය instead of ද්‍ය). The engine now recognizes `consonant + a + Y` as equivalent to `consonant + Y` directly, so both `vidhYaawa` and `vidhaYaawa` correctly produce විද්‍යාව. Also works with the backslash form (`dha\y`).
+- ✅ **Verified against a full linguistic reference for yansaya (්‍ය).** Every rule — automatic conjunct formation when a consonant is hal and ya attaches directly, plain ය when a vowel sits between them, plain ය at the start of a word, and the fact that yansaya almost only appears in Sanskrit/Pali-derived (tatsama) words — was checked against the engine and dictionary, and all of it already worked correctly.
+- 📖 **New Guide section explaining exactly when yansaya applies**, with a side-by-side comparison table, and a clear explanation of the one thing that trips people up: `dh` is the plain ද (as in ගෙදර), so `dhya` gives ද්‍ය — for the aspirated ධ (as in අධ්‍යක්ෂ, මාධ්‍ය) you need `dhh`, i.e. `dhhya` → ධ්‍ය. Same for `th`/`thh`.
 
 ## Features
 
@@ -21,7 +22,7 @@ Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana
 - ⌨️ **On-screen virtual keyboard** with dedicated conjunct-building keys for hard-to-type joined letters.
 - ⚙️ **Settings**: auto-copy to clipboard, sound effects, dark mode, real-time vs. word-boundary conversion, adjustable font size — all persisted locally.
 - 📲 **Installable app (PWA)** with offline support — "Install" on desktop/Android, "Add to Home Screen" on iPhone.
-- 📖 **Built-in scheme guide**, fully categorized, so anyone can learn the typing convention in a minute.
+- 📖 **Built-in scheme guide**, fully categorized with a dedicated yansaya explainer, so anyone can learn the typing convention in a few minutes.
 - 🌿 Fully responsive — desktop, Android, and iPhone Safari.
 
 ## The full typing scheme

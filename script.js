@@ -1036,6 +1036,15 @@
     ["Xy + vowel", "X්‍ය… (Yansaya, automatic) — e.g. kya → ක්‍ය"],
     ["XY (capital Y)", "X්‍ය (Yansaya, explicit) — e.g. vidhYaa → විද්‍යා"]
   ];
+  const YANSAYA_RULE_ITEMS = [
+    ["dhya", "ද්‍ය (viDHYA → විද්‍යා)"],
+    ["dhhya", "ධ්‍ය (aDHHYAksha → අධ්‍යක්ෂ)"],
+    ["thya", "ත්‍ය (saTHYA → සත්‍ය)"],
+    ["vya / wya", "ව්‍ය (kaVYA → කාව්‍ය)"],
+    ["mya", "ම්‍ය (souMYA → සෞම්‍ය)"],
+    ["diya (vowel before y)", "දිය — plain ය, NOT yansaya"],
+    ["yanawa (y at word start)", "යනවා — plain ය, NOT yansaya"]
+  ];
   const EXAMPLE_ITEMS = [
     ["mama gedara yanawa", "මම ගෙදර යනවා"],
     ["oyage nama mokakdha", "ඔයගෙ නම මොකක්ද"],
@@ -1054,6 +1063,8 @@
     render("aspirateGrid", ASPIRATE_ITEMS);
     render("sannakaGrid", SANNAKA_ITEMS);
     render("piliGrid", PILI_ITEMS);
+    document.getElementById("yansayaRuleGrid").innerHTML = YANSAYA_RULE_ITEMS.map(([k, v]) =>
+      `<div class="scheme-item"><code>${k}</code><span class="glyph" style="font-size:14px">${v}</span></div>`).join("");
     document.getElementById("specialGrid").innerHTML = SPECIAL_ITEMS.map(([k, v]) =>
       `<div class="scheme-item"><code>${k}</code><span class="glyph" style="font-size:14px">${v}</span></div>`).join("");
     document.getElementById("exampleGrid").innerHTML = EXAMPLE_ITEMS.map(([inp, out]) =>
