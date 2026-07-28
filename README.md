@@ -1,16 +1,13 @@
-# RL Sinhala Keyboard — V8.0 (Stable)
+# RL Sinhala Keyboard — V8.1 (Stable)
 
-A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction (now available in every typing field, not just the main editor), a built-in bilingual dictionary with its own Singlish input, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
+A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction in every typing field, a built-in bilingual dictionary with its own Singlish input, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V8.0
+## What's new in V8.1
 
-- 🔮 **Suggestions now work everywhere, not just the Type tab.** The full compose-with-suggestions popup — dictionary-verified spellings, prefix completion, numbered picks, arrow-key navigation — now also runs in the **Font Converter** input (when converting from Unicode) and the **Dictionary** search box.
-- 📘 **Dictionary tab gets its own Sinhala/English typing toggle**, just like the mic. Switch to සිං to type Singlish with live suggestions (selecting one searches immediately); switch to EN to type plain English — no special handling needed since English search already worked directly.
-- 🏗️ **Under the hood:** the compose engine was generalized to serve any input field on the page instead of being hardwired to the main editor, and the suggestion popup now uses fixed positioning so it can correctly anchor itself to whichever field you're typing in, anywhere on the page.
-- 🎨 **More premium UI polish** — the suggestion popup now has a smooth entrance animation, and the Dictionary search box picked up the same glowing focus state as the main editor.
+- 📖 **Guide tab fully redesigned** around the official scheme reference — numbered sections (1–8) each pairing the authentic Sinhala explanation with its table, instead of terse English captions. Covers vowels, consonants, aspirated letters, prenasalized (සඤ්ඤක) letters, letter+vowel-sign (පිළි) combinations, special characters, conjuncts, and a dedicated yansaya explainer — all in one clearly organized place.
 
 ## Features
 
@@ -24,7 +21,7 @@ Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana
 - ⌨️ **On-screen virtual keyboard** with dedicated conjunct-building keys for hard-to-type joined letters.
 - ⚙️ **Settings**: auto-copy to clipboard, sound effects, dark mode, real-time vs. word-boundary conversion, adjustable font size — all persisted locally.
 - 📲 **Installable app (PWA)** with offline support — "Install" on desktop/Android, "Add to Home Screen" on iPhone.
-- 📖 **Built-in scheme guide**, fully categorized with a dedicated yansaya explainer, so anyone can learn the typing convention in a few minutes.
+- 📖 **Built-in scheme guide**, numbered and fully categorized around the official reference, with a dedicated yansaya explainer, so anyone can learn the typing convention in a few minutes.
 - 🌿 Fully responsive — desktop, Android, and iPhone Safari.
 
 ## The full typing scheme
