@@ -114,7 +114,7 @@
   /* ----------------------------------------------------------------------
    * 2. SETTINGS (persisted)
    * -------------------------------------------------------------------- */
-  const DEFAULT_SETTINGS = { autoCopy: false, sound: false, darkMode: false, realtime: true, fontSize: "medium", voiceLang: "si-LK" };
+  const DEFAULT_SETTINGS = { autoCopy: false, sound: false, darkMode: false, realtime: true, fontSize: "medium", voiceLang: "si-LK", dictLang: "si" };
   let settings = { ...DEFAULT_SETTINGS };
 
   function loadSettings() {
@@ -137,6 +137,7 @@
     const sizes = { small: "16px", medium: "19px", large: "23px" };
     document.documentElement.style.setProperty("--editor-font-size", sizes[settings.fontSize] || sizes.medium);
     if (typeof updateMicLangUI === "function") updateMicLangUI();
+    if (typeof updateDictLangUI === "function") updateDictLangUI();
   }
 
   /* ----------------------------------------------------------------------
@@ -290,10 +291,10 @@
   });
 
   /* ----------------------------------------------------------------------
-   * 7. MAIN EDITOR — composing state machine + floating popup
+   * 7. COMPOSING STATE MACHINE + FLOATING POPUP — shared by any input field
+   *    (main editor, Font Converter input, Dictionary search box)
    * -------------------------------------------------------------------- */
   const editor = document.getElementById("editor");
-  const editorBody = document.querySelector(".editor-body");
   const composePopup = document.getElementById("composePopup");
   const composePreview = document.getElementById("composePreview");
   const composeSuggestions = document.getElementById("composeSuggestions");
@@ -303,15 +304,34 @@
   let pending = "";
   let pendingStart = null;
   let previewLen = 0;
+  let pendingTarget = null;
   let highlightedIndex = -1;
   let currentMatches = [];
 
+  // Whether live Singlish typing is currently active for a given field. The main editor is
+  // gated by the සිං/EN voice-language toggle; the Font Converter input only composes when
+  // converting FROM Unicode; the Dictionary search box has its own සිං/EN toggle.
+  function isComposeEnabledFor(target) {
+    if (target === editor) return settings.voiceLang !== "en-US";
+    if (typeof convertInput !== "undefined" && target === convertInput) return convertDirection.value.startsWith("uni2");
+    if (typeof dictSearchInput !== "undefined" && target === dictSearchInput) return settings.dictLang !== "en";
+    return true;
+  }
+  // What to do right after a word is finalized (either by typing a boundary character, or by
+  // picking a suggestion) — each field has different follow-up behavior.
+  function afterCompose(target) {
+    if (target === editor) { updateCounts(); maybeAutoCopy(); }
+    else if (typeof convertInput !== "undefined" && target === convertInput) { runConvert(); }
+    else if (typeof dictSearchInput !== "undefined" && target === dictSearchInput) { runDictSearch(); }
+  }
+
   function currentPreview() { return transliterate(pending); }
   function isCursorAtPendingEnd() {
-    return pendingStart !== null && editor.selectionStart === pendingStart + previewLen && editor.selectionEnd === pendingStart + previewLen;
+    return pendingTarget && pendingStart !== null &&
+      pendingTarget.selectionStart === pendingStart + previewLen && pendingTarget.selectionEnd === pendingStart + previewLen;
   }
   function resetPending() {
-    pending = ""; pendingStart = null; previewLen = 0;
+    pending = ""; pendingStart = null; previewLen = 0; pendingTarget = null;
     hideComposePopup();
   }
   function maybeAutoCopy() {
@@ -319,16 +339,17 @@
   }
 
   function renderPreview() {
+    const target = pendingTarget;
     const preview = currentPreview();
-    const before = editor.value.slice(0, pendingStart);
-    const after = editor.value.slice(pendingStart + previewLen);
-    editor.value = before + preview + after;
+    const before = target.value.slice(0, pendingStart);
+    const after = target.value.slice(pendingStart + previewLen);
+    target.value = before + preview + after;
     previewLen = preview.length;
     const pos = pendingStart + previewLen;
-    editor.setSelectionRange(pos, pos);
+    target.setSelectionRange(pos, pos);
     sfx.key();
-    showComposePopup(pos, preview, pending);
-    updateCounts();
+    showComposePopup(target, pos, preview, pending);
+    afterCompose(target);
   }
 
   /* ---- caret pixel position via mirror element (cached & reused for smooth typing) ---- */
@@ -362,21 +383,22 @@
     return { top: mirrorSpan.offsetTop, left: mirrorSpan.offsetLeft };
   }
 
-  function showComposePopup(cursorPos, previewText, rawWord) {
+  function showComposePopup(target, cursorPos, previewText, rawWord) {
     composePreview.textContent = previewText || "";
     renderComposeSuggestions(previewText || "", rawWord || "");
     if (!previewText) { hideComposePopup(); return; }
 
     composePopup.hidden = false;
-    const coords = getCaretCoords(editor, cursorPos);
-    const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 24;
-    let top = editor.offsetTop + coords.top - editor.scrollTop;
-    let left = editor.offsetLeft + coords.left;
+    const coords = getCaretCoords(target, cursorPos);
+    const rect = target.getBoundingClientRect();
+    const lineHeight = parseFloat(getComputedStyle(target).lineHeight) || 24;
+    let top = rect.top + coords.top - target.scrollTop;
+    let left = rect.left + coords.left;
 
     const popupW = composePopup.offsetWidth || 220;
     const popupH = composePopup.offsetHeight || 60;
-    const maxLeft = editorBody.clientWidth - popupW - 4;
-    left = Math.max(4, Math.min(left, maxLeft));
+    const maxLeft = window.innerWidth - popupW - 8;
+    left = Math.max(8, Math.min(left, maxLeft));
 
     const spaceAbove = top;
     if (spaceAbove > popupH + 14) {
@@ -475,17 +497,17 @@
     [...composeSuggestions.children].forEach((c, i) => c.classList.toggle("highlighted", i === idx));
   }
   function applySuggestion(word) {
-    const before = editor.value.slice(0, pendingStart);
-    const after = editor.value.slice(pendingStart + previewLen);
+    const target = pendingTarget;
+    const before = target.value.slice(0, pendingStart);
+    const after = target.value.slice(pendingStart + previewLen);
     const insert = word + " ";
-    editor.value = before + insert + after;
+    target.value = before + insert + after;
     const pos = before.length + insert.length;
-    editor.setSelectionRange(pos, pos);
+    target.setSelectionRange(pos, pos);
     sfx.select();
     resetPending();
-    editor.focus();
-    updateCounts();
-    maybeAutoCopy();
+    target.focus();
+    afterCompose(target);
   }
 
   function updateCounts() {
@@ -495,13 +517,14 @@
     wordCountEl.textContent = words + " words";
   }
 
-  editor.addEventListener("beforeinput", (e) => {
+  // Shared beforeinput/keydown/keyup/click/blur handlers — attached to the main editor here,
+  // and to the Font Converter input / Dictionary search box in their own sections below.
+  function handleComposeBeforeInput(e) {
+    const target = e.target;
     const type = e.inputType;
 
-    /* ---- English mode: the සිං/EN toggle now also controls keyboard typing,
-       not just voice — when EN is active, typed letters are left exactly as typed. ---- */
-    if (settings.voiceLang === "en-US") {
-      if (pending) resetPending();
+    if (!isComposeEnabledFor(target)) {
+      if (pendingTarget === target) resetPending();
       return; // let the browser insert the character normally, no transliteration
     }
 
@@ -512,30 +535,29 @@
         if (isWordChar) {
           // allow native insertion, update the live-preview popup without touching the field
           requestAnimationFrame(() => {
-            const pos = editor.selectionStart;
+            const pos = target.selectionStart;
             let start = pos;
-            while (start > 0 && LATIN_WORD_CHAR.test(editor.value[start - 1])) start--;
-            const rawWord = editor.value.slice(start, pos);
+            while (start > 0 && LATIN_WORD_CHAR.test(target.value[start - 1])) start--;
+            const rawWord = target.value.slice(start, pos);
             if (rawWord) {
-              pendingStart = start; previewLen = pos - start; pending = rawWord;
-              showComposePopup(pos, transliterate(rawWord), rawWord);
+              pendingTarget = target; pendingStart = start; previewLen = pos - start; pending = rawWord;
+              showComposePopup(target, pos, transliterate(rawWord), rawWord);
             } else { resetPending(); }
           });
           return;
         } else {
           e.preventDefault();
-          const pos = editor.selectionStart;
+          const pos = target.selectionStart;
           let start = pos;
-          while (start > 0 && LATIN_WORD_CHAR.test(editor.value[start - 1])) start--;
-          const rawWord = editor.value.slice(start, pos);
+          while (start > 0 && LATIN_WORD_CHAR.test(target.value[start - 1])) start--;
+          const rawWord = target.value.slice(start, pos);
           const converted = rawWord ? transliterate(rawWord) : "";
-          const before = editor.value.slice(0, start), after = editor.value.slice(pos);
-          editor.value = before + converted + e.data + after;
+          const before = target.value.slice(0, start), after = target.value.slice(pos);
+          target.value = before + converted + e.data + after;
           const newPos = before.length + converted.length + e.data.length;
-          editor.setSelectionRange(newPos, newPos);
+          target.setSelectionRange(newPos, newPos);
           resetPending();
-          updateCounts();
-          maybeAutoCopy();
+          afterCompose(target);
           return;
         }
       }
@@ -545,13 +567,14 @@
 
     /* ---- Real-time mode (default): live per-keystroke composing ---- */
     if (type === "insertText" && e.data) {
-      if (pending && !isCursorAtPendingEnd()) resetPending();
+      if (pending && (pendingTarget !== target || !isCursorAtPendingEnd())) resetPending();
       const isWordChar = [...e.data].every(ch => LATIN_WORD_CHAR.test(ch));
       if (isWordChar) {
         e.preventDefault();
         if (pendingStart === null) {
-          const selStart = editor.selectionStart, selEnd = editor.selectionEnd;
-          if (selEnd > selStart) editor.value = editor.value.slice(0, selStart) + editor.value.slice(selEnd);
+          pendingTarget = target;
+          const selStart = target.selectionStart, selEnd = target.selectionEnd;
+          if (selEnd > selStart) target.value = target.value.slice(0, selStart) + target.value.slice(selEnd);
           pendingStart = selStart;
         }
         pending += e.data;
@@ -563,23 +586,23 @@
     }
 
     if (type === "deleteContentBackward") {
-      if (pending && isCursorAtPendingEnd()) {
+      if (pending && pendingTarget === target && isCursorAtPendingEnd()) {
         e.preventDefault();
         pending = pending.slice(0, -1);
         if (!pending) {
-          const before = editor.value.slice(0, pendingStart), after = editor.value.slice(pendingStart + previewLen);
-          editor.value = before + after;
-          editor.setSelectionRange(pendingStart, pendingStart);
-          resetPending(); updateCounts();
+          const before = target.value.slice(0, pendingStart), after = target.value.slice(pendingStart + previewLen);
+          target.value = before + after;
+          target.setSelectionRange(pendingStart, pendingStart);
+          resetPending(); afterCompose(target);
         } else { renderPreview(); }
       } else { resetPending(); }
       return;
     }
     resetPending();
-  });
+  }
 
-  editor.addEventListener("keydown", (e) => {
-    if (composePopup.hidden || !currentMatches.length) return;
+  function handleComposeKeydown(e) {
+    if (composePopup.hidden || !currentMatches.length || pendingTarget !== e.target) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setHighlighted((highlightedIndex + 1) % currentMatches.length); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setHighlighted((highlightedIndex - 1 + currentMatches.length) % currentMatches.length); }
     else if (e.key === "Enter" && highlightedIndex >= 0) { e.preventDefault(); applySuggestion(currentMatches[highlightedIndex]); }
@@ -588,18 +611,29 @@
       if (idx < currentMatches.length) { e.preventDefault(); applySuggestion(currentMatches[idx]); }
     }
     else if (e.key === "Escape") { hideComposePopup(); }
-  });
-
-  editor.addEventListener("keyup", (e) => {
+  }
+  function handleComposeKeyup(e) {
     if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
-      if (pending && !isCursorAtPendingEnd()) resetPending();
+      if (pending && pendingTarget === e.target && !isCursorAtPendingEnd()) resetPending();
     }
-  });
-  editor.addEventListener("click", () => { if (pending && !isCursorAtPendingEnd()) resetPending(); });
-  editor.addEventListener("blur", (e) => {
+  }
+  function handleComposeClick(e) {
+    if (pending && pendingTarget === e.target && !isCursorAtPendingEnd()) resetPending();
+  }
+  function handleComposeBlur(e) {
+    const target = e.target;
     // don't dismiss if focus moved into the popup itself
-    setTimeout(() => { if (!composePopup.contains(document.activeElement)) resetPending(); }, 120);
-  });
+    setTimeout(() => { if (pendingTarget === target && !composePopup.contains(document.activeElement)) resetPending(); }, 120);
+  }
+  function attachComposeHandlers(el) {
+    el.addEventListener("beforeinput", handleComposeBeforeInput);
+    el.addEventListener("keydown", handleComposeKeydown);
+    el.addEventListener("keyup", handleComposeKeyup);
+    el.addEventListener("click", handleComposeClick);
+    el.addEventListener("blur", handleComposeBlur);
+  }
+
+  attachComposeHandlers(editor);
   editor.addEventListener("input", () => { updateCounts(); maybeAutoCopy(); });
   window.addEventListener("resize", () => { if (!composePopup.hidden) hideComposePopup(); });
 
@@ -829,58 +863,10 @@
   convertDirection.addEventListener("change", updateConvertLabels);
   updateConvertLabels();
 
-  // Reusable lightweight version of the live word-composing engine (no popup/suggestions —
-  // just conversion), so the converter's own input box can also be typed in Singlish.
-  function attachLiveTransliteration(textarea, isEnabled, onChange) {
-    let pend = "", pendStart = null, prevLen = 0;
-    const atEnd = () => pendStart !== null && textarea.selectionStart === pendStart + prevLen && textarea.selectionEnd === pendStart + prevLen;
-    const reset = () => { pend = ""; pendStart = null; prevLen = 0; };
-    const render = () => {
-      const preview = transliterate(pend);
-      const before = textarea.value.slice(0, pendStart), after = textarea.value.slice(pendStart + prevLen);
-      textarea.value = before + preview + after;
-      prevLen = preview.length;
-      const pos = pendStart + prevLen;
-      textarea.setSelectionRange(pos, pos);
-      onChange();
-    };
-    textarea.addEventListener("beforeinput", (e) => {
-      if (!isEnabled()) { reset(); return; }
-      const type = e.inputType;
-      if (type === "insertText" && e.data) {
-        if (pend && !atEnd()) reset();
-        const isWordChar = [...e.data].every(ch => LATIN_WORD_CHAR.test(ch));
-        if (isWordChar) {
-          e.preventDefault();
-          if (pendStart === null) {
-            const s = textarea.selectionStart, en = textarea.selectionEnd;
-            if (en > s) textarea.value = textarea.value.slice(0, s) + textarea.value.slice(en);
-            pendStart = s;
-          }
-          pend += e.data;
-          render();
-        } else { reset(); }
-        return;
-      }
-      if (type === "deleteContentBackward") {
-        if (pend && atEnd()) {
-          e.preventDefault();
-          pend = pend.slice(0, -1);
-          if (!pend) {
-            const before = textarea.value.slice(0, pendStart), after = textarea.value.slice(pendStart + prevLen);
-            textarea.value = before + after;
-            textarea.setSelectionRange(pendStart, pendStart);
-            reset(); onChange();
-          } else { render(); }
-        } else { reset(); }
-        return;
-      }
-      reset();
-    });
-    textarea.addEventListener("blur", () => { if (pend) reset(); });
-    textarea.addEventListener("click", () => { if (pend && !atEnd()) reset(); });
-  }
-  attachLiveTransliteration(convertInput, () => convertDirection.value.startsWith("uni2"), () => runConvert());
+  // The Font Converter input now gets the same live composing + suggestion popup as the
+  // main Type tab, active only while converting FROM Unicode (isComposeEnabledFor handles
+  // the gating). Selecting a suggestion re-runs the conversion automatically (afterCompose).
+  attachComposeHandlers(convertInput);
 
   function runConvert() {
     const val = convertInput.value; let out = "";
@@ -925,7 +911,23 @@
   const dictSearchBtn = document.getElementById("dictSearchBtn");
   const dictStatus = document.getElementById("dictStatus");
   const dictResults = document.getElementById("dictResults");
+  const dictLangToggle = document.getElementById("dictLangToggle");
   const SINHALA_RE = /[\u0D80-\u0DFF]/;
+
+  function updateDictLangUI() {
+    [...dictLangToggle.children].forEach(b => b.classList.toggle("active", b.dataset.lang === settings.dictLang));
+    dictSearchInput.placeholder = settings.dictLang === "en" ? "Type a word in English…" : "Type a word in Singlish or Sinhala…";
+  }
+  dictLangToggle.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-lang]");
+    if (!btn) return;
+    settings.dictLang = btn.dataset.lang;
+    saveSettings();
+    if (pendingTarget === dictSearchInput) resetPending();
+    updateDictLangUI();
+    sfx.toggle();
+  });
+  updateDictLangUI();
 
   let meaningsLoadState = "idle"; // idle | loading | ready | error
   function ensureMeaningsLoaded() {
@@ -979,6 +981,7 @@
     if (meaningsLoadState !== "ready") { ensureMeaningsLoaded(); return; }
     renderDictResults(lookupMeaning(q), q);
   }
+  attachComposeHandlers(dictSearchInput);
   dictSearchBtn.addEventListener("click", runDictSearch);
   dictSearchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") runDictSearch(); });
   dictSearchInput.addEventListener("focus", ensureMeaningsLoaded);

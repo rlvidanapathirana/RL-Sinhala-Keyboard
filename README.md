@@ -1,23 +1,25 @@
-# RL Sinhala Keyboard — V6.5 (Stable)
+# RL Sinhala Keyboard — V8.0 (Stable)
 
-A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction, a built-in English ⇄ Sinhala dictionary, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion (typeable in Singlish too). Pure HTML/CSS/JS, no build step, works on GitHub Pages.
+A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction (now available in every typing field, not just the main editor), a built-in bilingual dictionary with its own Singlish input, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V6.5
+## What's new in V8.0
 
-- ✅ **Verified against a full linguistic reference for yansaya (්‍ය).** Every rule — automatic conjunct formation when a consonant is hal and ya attaches directly, plain ය when a vowel sits between them, plain ය at the start of a word, and the fact that yansaya almost only appears in Sanskrit/Pali-derived (tatsama) words — was checked against the engine and dictionary, and all of it already worked correctly.
-- 📖 **New Guide section explaining exactly when yansaya applies**, with a side-by-side comparison table, and a clear explanation of the one thing that trips people up: `dh` is the plain ද (as in ගෙදර), so `dhya` gives ද්‍ය — for the aspirated ධ (as in අධ්‍යක්ෂ, මාධ්‍ය) you need `dhh`, i.e. `dhhya` → ධ්‍ය. Same for `th`/`thh`.
+- 🔮 **Suggestions now work everywhere, not just the Type tab.** The full compose-with-suggestions popup — dictionary-verified spellings, prefix completion, numbered picks, arrow-key navigation — now also runs in the **Font Converter** input (when converting from Unicode) and the **Dictionary** search box.
+- 📘 **Dictionary tab gets its own Sinhala/English typing toggle**, just like the mic. Switch to සිං to type Singlish with live suggestions (selecting one searches immediately); switch to EN to type plain English — no special handling needed since English search already worked directly.
+- 🏗️ **Under the hood:** the compose engine was generalized to serve any input field on the page instead of being hardwired to the main editor, and the suggestion popup now uses fixed positioning so it can correctly anchor itself to whichever field you're typing in, anywhere on the page.
+- 🎨 **More premium UI polish** — the suggestion popup now has a smooth entrance animation, and the Dictionary search box picked up the same glowing focus state as the main editor.
 
 ## Features
 
-- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word).
+- ⌨️ **Singlish → Unicode**: type in Latin script, get live Sinhala Unicode as you type, following the complete official typing scheme (word-scoped composition, so multi-letter combinations never get corrupted mid-word) — available in the Type tab, the Font Converter, and the Dictionary search box.
 - 🎙️ **Bilingual voice + keyboard typing** with live interim preview: a single Sinhala/English toggle governs both speech recognition language and whether keyboard input gets transliterated.
-- 💬 **Floating compose popup**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word.
+- 💬 **Floating compose popup everywhere**: a Google Input Tools-style vertical list above your cursor, numbered 1–9 — press the number key, click, or use arrow keys + Enter to pick a word, in any field that supports it.
 - 💡 **Word prediction**: dictionary-verified spellings first for words 4+ letters (145,000 entries, with dh/d and th/t variant fallback), prefix-completion for longer words, frequency-ranked fallback from a 30,000-word corpus, and your raw typed text always available as a fallback option.
-- 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable or via double-click.
-- 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, typeable in Singlish, using a 1,600+ entry mapping table with longest-match substitution.
+- 📘 **Built-in dictionary**: 130,000+ entry English ⇄ Sinhala lookup, searchable (with its own Singlish typing + suggestions) or via double-click in the Type tab.
+- 🔄 **Legacy font converter**: convert Unicode ⇄ FM Abhaya and Unicode ⇄ ISI, both directions, typeable in Singlish with full suggestions, using a 1,600+ entry mapping table with longest-match substitution.
 - 📋 **Copy as…**: copy your text as Unicode, FM Abhaya, or ISI directly.
 - ⌨️ **On-screen virtual keyboard** with dedicated conjunct-building keys for hard-to-type joined letters.
 - ⚙️ **Settings**: auto-copy to clipboard, sound effects, dark mode, real-time vs. word-boundary conversion, adjustable font size — all persisted locally.
