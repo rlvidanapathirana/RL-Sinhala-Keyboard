@@ -1,11 +1,11 @@
-# RL Sinhala Keyboard — V8.1 (Stable)
+# RL Sinhala Keyboard — V 9.0 (Stable)
 
 A complete, modern, installable web app for Sinhala typing — Singlish → Unicode live transliteration backed by a real 145,000-entry dictionary and the full official typing scheme, bilingual voice + keyboard typing with live interim results, Google-style numbered word prediction in every typing field, a built-in bilingual dictionary with its own Singlish input, and bidirectional Unicode ⇄ FM Abhaya / ISI legacy font conversion. Pure HTML/CSS/JS, no build step, works on GitHub Pages.
 
 **Developed by V.P.R. Lakshan Vidanapathirana**
 Portfolio: [lakshan.vercel.app](https://lakshan.vercel.app) · rlvidanapathirana@gmail.com
 
-## What's new in V8.1
+## What's new in V 9.0 (Stable)
 
 - 📖 **Guide tab fully redesigned** around the official scheme reference — numbered sections (1–8) each pairing the authentic Sinhala explanation with its table, instead of terse English captions. Covers vowels, consonants, aspirated letters, prenasalized (සඤ්ඤක) letters, letter+vowel-sign (පිළි) combinations, special characters, conjuncts, and a dedicated yansaya explainer — all in one clearly organized place.
 
