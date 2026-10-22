@@ -1,5 +1,5 @@
-/* RL Sinhala Keyboard — Service Worker (V 9.0 stable) */
-const CACHE_NAME = "rl-sinhala-keyboard-v9-0";
+/* RL Sinhala Keyboard — Service Worker (V 10.0 stable) */
+const CACHE_NAME = "rl-sinhala-keyboard-v10-0";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const CORE_ASSETS = [
   "./mapping.json",
   "./words.json",
   "./manifest.json",
+  "./assets/fonts/FM-Abhaya.ttf",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./assets/favicon-32.png"

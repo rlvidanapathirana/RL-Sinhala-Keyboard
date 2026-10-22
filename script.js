@@ -852,10 +852,23 @@
     uni2isi: ["Input (type Singlish or paste Unicode)", "Output (ISI)"],
     fm2uni: ["Input (FM Abhaya)", "Output (Unicode)"], isi2uni: ["Input (ISI)", "Output (Unicode)"]
   };
+  let customLoadedFont = null;
+  function applyOutputFont() {
+    const dir = convertDirection.value;
+    if (customLoadedFont) {
+      convertOutput.style.fontFamily = dir.startsWith("uni2") ? customLoadedFont : "";
+    } else if (dir === "uni2fm") {
+      convertOutput.style.fontFamily = "'FMAbhaya', sans-serif";
+    } else {
+      convertOutput.style.fontFamily = "";
+    }
+  }
+
   function updateConvertLabels() {
     const [inLabel, outLabel] = DIRECTION_LABELS[convertDirection.value];
     convertInputLabel.textContent = inLabel; convertOutputLabel.textContent = outLabel;
     convertOutput.classList.toggle("legacy-preview", convertDirection.value.startsWith("uni2"));
+    applyOutputFont();
     convertInput.placeholder = convertDirection.value.startsWith("uni2")
       ? "Type in Singlish (e.g. mama gedara yanawa) or paste Unicode text…"
       : "Paste or type legacy text here…";
@@ -899,7 +912,8 @@
     const fontFace = new FontFace("RLLegacyPreviewFont", `url(${url})`);
     fontFace.load().then(loaded => {
       document.fonts.add(loaded);
-      convertOutput.style.fontFamily = "'RLLegacyPreviewFont', sans-serif";
+      customLoadedFont = "'RLLegacyPreviewFont', sans-serif";
+      applyOutputFont();
       showToast("Font loaded — preview updated ✓");
     }).catch(() => showToast("Couldn't load that font file"));
   });

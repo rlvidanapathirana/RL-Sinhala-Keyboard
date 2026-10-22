@@ -3,6 +3,13 @@
    Ceylon Tea Green + Gold, with Dark Mode
    ========================================================================= */
 
+/* Legacy Sinhala Font (FM Abhaya) for live font converter preview */
+@font-face {
+  font-family: 'FMAbhaya';
+  src: url('assets/fonts/FM-Abhaya.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root{
   --tea-950:#0F2B20; --tea-900:#153826; --tea-800:#1B4332; --tea-700:#22543D;
   --tea-600:#2D6A4F; --tea-500:#3E8E68; --tea-400:#52B788; --tea-100:#DCEEE3; --tea-50:#F1F8F4;
